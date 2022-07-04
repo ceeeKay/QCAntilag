@@ -1,13 +1,4 @@
-//PlayerPostThink after dying, before dead check  (or elohim_impulse for crmod)
-
-
-if (self.impulse == 37)
-    client_responsetime_show();
-else if (self.impulse == 38)
-    client_responsetime_update();
-	
-	
-//Also call this in PlayerPostThink after dying, before dead check
+//call this in PlayerPostThink after dying, before dead check
 	
 SetPositions();
 
