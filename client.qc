@@ -3,8 +3,8 @@
 
 if (self.impulse == 37)
     client_responsetime_show();
-else if (self.impulse == 38) // used for sping (was 103)
-	client_responsetime_update();
+else if (self.impulse == 38)
+    client_responsetime_update();
 	
 	
 //Also call this in PlayerPostThink after dying, before dead check
@@ -50,6 +50,7 @@ void () client_responsetime_get =
     stuffcmd(self, "impulse 38;\n");
 };
 
+//debug function to see response times and frames
 void () client_responsetime_show =
 {
     sprint3(self, "response time3: ", ftos(self.responsetime3), "\n");
@@ -68,6 +69,7 @@ void () client_responsetime_show =
     sprint5(self, "last frame9: ", vtos(self.lastorigin9), " ", ftos(self.lastorigintime9), "\n");
 };
 
+//rotate player positions
 void () SetPositions =
 {
 	if (time > self.responsetimecheck)
