@@ -783,3 +783,4 @@ float(entity targ, entity inflictor) CanDamage;
 .float responsetime2;
 .float responsetime3;
 .float responsetimecheck;
+.float spamtime;

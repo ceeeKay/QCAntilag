@@ -1155,6 +1155,12 @@ void () client_responsetime_get =
 //debug function to see response times and frames
 void () client_responsetime_show =
 {
+	//don't let players spam this
+	if (time < self.spamtime)
+		return;
+		
+	self.spamtime = (time + 5);
+
     sprint(self, "response time3: ");
 	sprint(self, ftos(self.responsetime3));
 	sprint(self, "\n");
