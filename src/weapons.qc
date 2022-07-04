@@ -262,7 +262,7 @@ void (float pingtime, entity ignore) antilag_rewind_all =
 {
 	local entity player;
 
-	float timestamp_we_want = (time - pingtime);
+	float timestamp_we_want = ((time * 1000) - pingtime);
   
 	player = find(world, classname, "player");
 
