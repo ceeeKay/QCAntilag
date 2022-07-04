@@ -1,5 +1,6 @@
 
 void() InitBodyQue;
+void client_responsetime_get_all();
 
 
 void() main =
@@ -346,6 +347,12 @@ void() StartFrame =
 	teamplay = cvar("teamplay");
 	skill = cvar("skill");
 	framecount = framecount + 1;
+	
+	if (time > responsetimecheck)
+	{
+		responsetimecheck = (time + 10);
+		client_responsetime_get_all();
+	}
 };
 
 /*

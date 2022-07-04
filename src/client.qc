@@ -1116,40 +1116,60 @@ void() CheckPowerups =
 
 };
 
-void () client_responsetime_update =
+void () client_ping_think =
 {
-    if (self.finaldest_x == 0)
+    local entity client;
+
+    client = find(world, classname, "player");
+    while (client)
     {
-        //don't let clients interfere with response time
-        return;
+		client.responsetime3 = client.responsetime2;
+		client.responsetime2 = client.responsetime1;
+
+		if (client.finaldest_y > self.finaldest_x)
+			client.responsetime1 = floor(client.finaldest_y - self.finaldest_x);
+		else
+			client.responsetime1 = ANTILAG_MAX_RESPONSETIME;
+
+		if (client.responsetime2 > 0)
+		{
+			if (client.responsetime3 > 0)
+			{
+				client.responsetime = ((client.responsetime1 + client.responsetime2 + client.responsetime3) / 3);
+			}
+			else
+			{
+				client.responsetime = ((client.responsetime1 + client.responsetime2) / 2);
+			}
+		}
+		else
+		{
+			client.responsetime = client.responsetime1;
+		}
+        client = find(client, classname, "player");
     }
 
-    self.responsetime3 = self.responsetime2;
-    self.responsetime2 = self.responsetime1;
-    self.responsetime1 = (time - self.finaldest_x);
-    self.finaldest_x = 0;
-
-    if (self.responsetime2 > 0)
-    {
-        if (self.responsetime3 > 0)
-        {
-            self.responsetime = ((self.responsetime1 + self.responsetime2 + self.responsetime3) / 3);
-        }
-        else
-        {
-            self.responsetime = ((self.responsetime1 + self.responsetime2) / 2);
-        }
-    }
-    else
-    {
-        self.responsetime = self.responsetime1;
-    }
+    remove(self);
 };
 
-void () client_responsetime_get =
+void () client_responsetime_get_all =
 {
-    self.finaldest_x = time;
-    stuffcmd(self, "impulse 38;\n");
+    local entity ping;
+
+    WriteByte(MSG_BROADCAST, SVC_STUFFTEXT);
+    WriteString(MSG_BROADCAST, "impulse 38\n");
+
+    ping = spawn();
+    ping.classname = "client_ping";
+    ping.owner = world;
+    ping.nextthink = time + 2;
+    ping.think = client_ping_think;
+    ping.finaldest_x = (time * 1000);
+};
+
+void () client_responsetime_set =
+{
+    self.finaldest_y = (time * 1000);
 };
 
 //debug function to see response times and frames
@@ -1226,12 +1246,6 @@ void () client_responsetime_show =
 //rotate player positions
 void () SetPositions =
 {
-	if (time > self.responsetimecheck)
-	{
-		self.responsetimecheck = (time + 10);
-		client_responsetime_get();
-	}
-
 	self.lastorigin9 = self.lastorigin8;
 	self.lastorigintime9 = self.lastorigintime8;
 	self.lastorigin8 = self.lastorigin7;
@@ -1249,7 +1263,7 @@ void () SetPositions =
 	self.lastorigin2 = self.lastorigin1;
 	self.lastorigintime2 = self.lastorigintime1;
 	self.lastorigin1 = self.origin;
-	self.lastorigintime1 = time;
+	self.lastorigintime1 = (time * 1000);
 };
 
 /*
@@ -1264,7 +1278,7 @@ void() PlayerPostThink =
 	if (self.impulse == 37)
 		client_responsetime_show();
 	else if (self.impulse == 38)
-		client_responsetime_update();
+		client_responsetime_set();
 
 	SetPositions();
 
