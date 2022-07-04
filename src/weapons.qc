@@ -558,6 +558,8 @@ void() W_FireLightning =
 
 	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
 
+	antilag_rewind_all(self.responsetime, self);
+
 	org = self.origin + '0 0 16';
 
 	traceline (org, org + v_forward*600, TRUE, self);
@@ -573,6 +575,8 @@ void() W_FireLightning =
 	WriteCoord (MSG_BROADCAST, trace_endpos_z);
 
 	LightningDamage (self.origin, trace_endpos + v_forward*4, self, 30);
+	
+	antilag_restore_all();
 };
 
 
