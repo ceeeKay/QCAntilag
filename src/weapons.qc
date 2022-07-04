@@ -232,6 +232,70 @@ Used by shotgun, super shotgun, and enemy soldier firing
 Go to the trouble of combining multiple pellets into a single damage call.
 ================
 */
+void (entity e, float rewindtime) antilag_rewind =
+{
+	vector rewindorigin;
+
+	if (e.lastorigintime1 < rewindtime)
+		rewindorigin = e.lastorigin1;
+	else if (e.lastorigintime2 < rewindtime)
+		rewindorigin = e.lastorigin2;
+	else if (e.lastorigintime3 < rewindtime)
+		rewindorigin = e.lastorigin3;
+	else if (e.lastorigintime4 < rewindtime)
+		rewindorigin = e.lastorigin4;
+	else if (e.lastorigintime5 < rewindtime)
+		rewindorigin = e.lastorigin5;
+	else if (e.lastorigintime6 < rewindtime)
+		rewindorigin = e.lastorigin6;
+	else if (e.lastorigintime7 < rewindtime)
+		rewindorigin = e.lastorigin7;
+	else if (e.lastorigintime8 < rewindtime)
+		rewindorigin = e.lastorigin8;
+	else
+		rewindorigin = e.lastorigin9;
+
+  	setorigin(e, rewindorigin);
+}
+
+void (float pingtime, entity ignore) antilag_rewind_all =
+{
+	local entity player;
+
+	float timestamp_we_want = (time - pingtime);
+  
+	player = find(world, classname, "player");
+
+	while (player)
+	{
+		if (player.deadflag == DEAD_NO)
+		{
+			player.hold_origin = player.origin;
+			if (player != ignore)
+			{
+				antilag_rewind(player, timestamp_we_want);
+			}
+		}
+		player = find(player, classname, "player");
+	}
+}
+
+void () antilag_restore_all =
+{
+	local entity player;
+  
+	player = find(world, classname, "player");
+
+	while (player)
+	{
+		if (player.deadflag == DEAD_NO)
+		{
+			setorigin(player, player.hold_origin);
+		}
+		player = find(player, classname, "player");
+	}
+}
+
 void(float shotcount, vector dir, vector spread) FireBullets =
 {
 	local	vector direction;
@@ -242,6 +306,7 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	src = self.origin + v_forward*10;
 	src_z = self.absmin_z + self.size_z * 0.7;
 
+	antilag_rewind_all(self.responsetime, self);
 	ClearMultiDamage ();
 	while (shotcount > 0)
 	{
@@ -254,6 +319,7 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 		shotcount = shotcount - 1;
 	}
 	ApplyMultiDamage ();
+	antilag_restore_all();
 };
 
 /*

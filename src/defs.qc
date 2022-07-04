@@ -759,4 +759,27 @@ float (entity e, float healamount, float ignore) T_Heal; // health function
 
 float(entity targ, entity inflictor) CanDamage;
 
-
+.vector lastorigin1;
+.vector lastorigin2;
+.vector lastorigin3;
+.vector lastorigin4;
+.vector lastorigin5;
+.vector lastorigin6;
+.vector lastorigin7;
+.vector lastorigin8;
+.vector lastorigin9;
+.float lastorigintime1;
+.float lastorigintime2;
+.float lastorigintime3;
+.float lastorigintime4;
+.float lastorigintime5;
+.float lastorigintime6;
+.float lastorigintime7;
+.float lastorigintime8;
+.float lastorigintime9;
+.vector hold_origin;
+.float responsetime;
+.float responsetime1;
+.float responsetime2;
+.float responsetime3;
+.float responsetimecheck;

@@ -1116,6 +1116,135 @@ void() CheckPowerups =
 
 };
 
+void () client_responsetime_update =
+{
+    if (self.finaldest_x == 0)
+    {
+        //don't let clients interfere with response time
+        return;
+    }
+
+    self.responsetime3 = self.responsetime2;
+    self.responsetime2 = self.responsetime1;
+    self.responsetime1 = (time - self.finaldest_x);
+    self.finaldest_x = 0;
+
+    if (self.responsetime2 > 0)
+    {
+        if (self.responsetime3 > 0)
+        {
+            self.responsetime = ((self.responsetime1 + self.responsetime2 + self.responsetime3) / 3);
+        }
+        else
+        {
+            self.responsetime = ((self.responsetime1 + self.responsetime2) / 2);
+        }
+    }
+    else
+    {
+        self.responsetime = self.responsetime1;
+    }
+};
+
+void () client_responsetime_get =
+{
+    self.finaldest_x = time;
+    stuffcmd(self, "impulse 38;\n");
+};
+
+//debug function to see response times and frames
+void () client_responsetime_show =
+{
+    sprint(self, "response time3: ");
+	sprint(self, ftos(self.responsetime3));
+	sprint(self, "\n");
+    sprint(self, "response time2: ");
+	sprint(self, ftos(self.responsetime2));
+	sprint(self, "\n");
+    sprint(self, "response time1: ");
+	sprint(self, ftos(self.responsetime1));
+	sprint(self, "\n");
+    sprint(self, "response time:  ");
+	sprint(self, ftos(self.responsetime));
+	sprint(self, "\n");
+    sprint(self, "current origin: ");
+	sprint(self, vtos(self.origin));
+	sprint(self, "\n");
+    sprint(self, "last frame1: ");
+	sprint(self, vtos(self.lastorigin1));
+	sprint(self, " ");
+	sprint(self, ftos(self.lastorigintime1));
+	sprint(self, "\n");
+    sprint(self, "last frame2: ");
+	sprint(self, vtos(self.lastorigin2));
+	sprint(self, " ");
+	sprint(self, ftos(self.lastorigintime2));
+	sprint(self, "\n");
+    sprint(self, "last frame3: ");
+	sprint(self, vtos(self.lastorigin3));
+	sprint(self, " ");
+	sprint(self, ftos(self.lastorigintime3));
+	sprint(self, "\n");
+    sprint(self, "last frame4: ");
+	sprint(self, vtos(self.lastorigin4));
+	sprint(self, " ");
+	sprint(self, ftos(self.lastorigintime4));
+	sprint(self, "\n");
+    sprint(self, "last frame5: ");
+	sprint(self, vtos(self.lastorigin5));
+	sprint(self, " ");
+	sprint(self, ftos(self.lastorigintime5));
+	sprint(self, "\n");
+    sprint(self, "last frame6: ");
+	sprint(self, vtos(self.lastorigin6));
+	sprint(self, " ");
+	sprint(self, ftos(self.lastorigintime6));
+	sprint(self, "\n");
+    sprint(self, "last frame7: ");
+	sprint(self, vtos(self.lastorigin7));
+	sprint(self, " ");
+	sprint(self, ftos(self.lastorigintime7));
+	sprint(self, "\n");
+    sprint(self, "last frame8: ");
+	sprint(self, vtos(self.lastorigin8));
+	sprint(self, " ");
+	sprint(self, ftos(self.lastorigintime8));
+	sprint(self, "\n");
+    sprint(self, "last frame9: ");
+	sprint(self, vtos(self.lastorigin9));
+	sprint(self, " ");
+	sprint(self, ftos(self.lastorigintime9));
+	sprint(self, "\n");
+};
+
+//rotate player positions
+void () SetPositions =
+{
+	if (time > self.responsetimecheck)
+	{
+		self.responsetimecheck = (time + 10);
+		client_responsetime_get();
+	}
+
+	self.lastorigin9 = self.lastorigin8;
+	self.lastorigintime9 = self.lastorigintime8;
+	self.lastorigin8 = self.lastorigin7;
+	self.lastorigintime8 = self.lastorigintime7;
+	self.lastorigin7 = self.lastorigin6;
+	self.lastorigintime7 = self.lastorigintime6;
+	self.lastorigin6 = self.lastorigin5;
+	self.lastorigintime6 = self.lastorigintime5;
+	self.lastorigin5 = self.lastorigin4;
+	self.lastorigintime5 = self.lastorigintime4;
+	self.lastorigin4 = self.lastorigin3;
+	self.lastorigintime4 = self.lastorigintime3;
+	self.lastorigin3 = self.lastorigin2;
+	self.lastorigintime3 = self.lastorigintime2;
+	self.lastorigin2 = self.lastorigin1;
+	self.lastorigintime2 = self.lastorigintime1;
+	self.lastorigin1 = self.origin;
+	self.lastorigintime1 = time;
+};
 
 /*
 ================
@@ -1126,6 +1255,12 @@ Called every frame after physics are run
 */
 void() PlayerPostThink =
 {
+	if (self.impulse == 37)
+		client_responsetime_show();
+	else if (self.impulse == 38)
+		client_responsetime_update();
+
+	SetPositions();
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
