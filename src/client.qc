@@ -1127,7 +1127,7 @@ void () client_ping_think =
 		client.responsetime2 = client.responsetime1;
 
 		if (client.finaldest_y > self.finaldest_x)
-			client.responsetime1 = floor(client.finaldest_y - self.finaldest_x);
+			client.responsetime1 = (floor(client.finaldest_y - self.finaldest_x) - 16);
 		else
 			client.responsetime1 = ANTILAG_MAX_RESPONSETIME;
 
