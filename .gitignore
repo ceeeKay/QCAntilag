@@ -1,0 +1,6 @@
+*.pak
+*.zip
+*.exe
+*.log
+progs.dat
+progs.lno
