@@ -1,0 +1,38 @@
+{
+    // Grab fteqcc64 @ https://sourceforge.net/projects/fteqw/files/FTEQCC/fteqcc64.exe/download
+    // and qpakman @ http://glbsp.sourceforge.net/files/qpakman-062b.zip to use these tasks
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "compile",
+            "type": "shell",
+            "command": "cd src; fteqcc64; cd ..",
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "compile and package as pak0.pak",
+            "type": "shell",
+            "command": "cd src; fteqcc64; cd ..; qpakman progs.dat spawns -o pak0.pak",
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "compile and copy progs.dat to Saved Games\\Nightdive Studios\\Quake\\id1",
+            "type": "shell",
+            "command": "cd src; fteqcc64; cd ..; cp progs.dat $Env:homepath/Saved` Games/Nightdive` Studios/Quake/id1/",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "compile and copy progs.dat to \\Steam\\steamapps\\common\\Quake\\rerelease\\id1",
+            "type": "shell",
+            "command": "cd src; fteqcc64; cd ..; cp progs.dat C:/Program` Files` `(x86`)/Steam/steamapps/common/Quake/rerelease/id1",
+            "problemMatcher": [],
+            "group": "build"
+        }
+    ]
+}
