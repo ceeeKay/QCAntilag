@@ -381,6 +381,49 @@ ROCKETS
 ==============================================================================
 */
 
+void (string class) antilag_rewind_projectiles =
+{
+	local entity projectile;
+
+	projectile = find(world, classname, class);
+
+	while (projectile)
+	{
+		// Probably don't want to update based on projectile.owner.responsetime
+		// because it can keep changing (right?)
+		float timestamp_we_want = ((time * 1000) - projectile.responsetime);
+
+		// Check if we've already exploded (not sure if this is necessary?)
+		if (projectile.movetype != MOVETYPE_NONE)
+		{
+			// Store the projectile's .origin off to a temporary .hold_origin
+			projectile.hold_origin = projectile.origin;
+
+			// Rewind the projectile entity back to timestamp_we_want
+			antilag_rewind(projectile, timestamp_we_want);
+		}
+		projectile = find(projectile, classname, class);
+	}
+}
+
+void (string class) antilag_restore_projectiles =
+{
+	local entity projectile;
+
+	projectile = find(world, classname, class);
+
+	while (projectile)
+	{
+		// Check if we've already exploded (not sure if this is necessary?)
+		if (projectile.movetype != MOVETYPE_NONE)
+		{
+			// Put projectiles back where the server thinks they belong
+			setorigin(projectile, projectile.hold_origin);
+		}
+		projectile = find(projectile, classname, class);
+	}
+}
+
 void()	s_explode1	=	[0,		s_explode2] {};
 void()	s_explode2	=	[1,		s_explode3] {};
 void()	s_explode3	=	[2,		s_explode4] {};
@@ -467,6 +510,9 @@ void() W_FireRocket =
 	missile.angles = vectoangles(missile.velocity);
 
 	missile.touch = T_MissileTouch;
+
+// set .responsetime to owner's so position can be compensated for antilag
+	missile.responsetime = self.responsetime;
 
 // set missile duration
 	missile.nextthink = time + 5;

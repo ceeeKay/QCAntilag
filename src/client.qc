@@ -959,6 +959,10 @@ void() PlayerPreThink =
 		self.weapon = W_BestWeapon ();
 		W_SetCurrentAmmo ();
 	}
+
+	// Use clients' response times to temporarily move all projectiles back in time
+	antilag_rewind_projectiles("missile");
+	antilag_rewind_projectiles("spike");
 };
 
 /*
@@ -1243,27 +1247,40 @@ void () client_responsetime_show =
 	sprint(self, "\n");
 };
 
-//rotate player positions
-void () SetPositions =
+// rotate entity positions
+void (entity ent) SetPositions =
 {
-	self.lastorigin9 = self.lastorigin8;
-	self.lastorigintime9 = self.lastorigintime8;
-	self.lastorigin8 = self.lastorigin7;
-	self.lastorigintime8 = self.lastorigintime7;
-	self.lastorigin7 = self.lastorigin6;
-	self.lastorigintime7 = self.lastorigintime6;
-	self.lastorigin6 = self.lastorigin5;
-	self.lastorigintime6 = self.lastorigintime5;
-	self.lastorigin5 = self.lastorigin4;
-	self.lastorigintime5 = self.lastorigintime4;
-	self.lastorigin4 = self.lastorigin3;
-	self.lastorigintime4 = self.lastorigintime3;
-	self.lastorigin3 = self.lastorigin2;
-	self.lastorigintime3 = self.lastorigintime2;
-	self.lastorigin2 = self.lastorigin1;
-	self.lastorigintime2 = self.lastorigintime1;
-	self.lastorigin1 = self.origin;
-	self.lastorigintime1 = (time * 1000);
+	ent.lastorigin9 = ent.lastorigin8;
+	ent.lastorigintime9 = ent.lastorigintime8;
+	ent.lastorigin8 = ent.lastorigin7;
+	ent.lastorigintime8 = ent.lastorigintime7;
+	ent.lastorigin7 = ent.lastorigin6;
+	ent.lastorigintime7 = ent.lastorigintime6;
+	ent.lastorigin6 = ent.lastorigin5;
+	ent.lastorigintime6 = ent.lastorigintime5;
+	ent.lastorigin5 = ent.lastorigin4;
+	ent.lastorigintime5 = ent.lastorigintime4;
+	ent.lastorigin4 = ent.lastorigin3;
+	ent.lastorigintime4 = ent.lastorigintime3;
+	ent.lastorigin3 = ent.lastorigin2;
+	ent.lastorigintime3 = ent.lastorigintime2;
+	ent.lastorigin2 = ent.lastorigin1;
+	ent.lastorigintime2 = ent.lastorigintime1;
+	ent.lastorigin1 = ent.origin;
+	ent.lastorigintime1 = (time * 1000);
+};
+
+void (string class) SetProjectilePositions =
+{
+	local entity projectile;
+	projectile = find(world, classname, class);
+	while (projectile)
+	{
+		// Record updated position of projectile for antilag rewind
+		SetPositions(projectile);
+
+		projectile = find(projectile, classname, class);
+	}
 };
 
 /*
@@ -1280,7 +1297,14 @@ void() PlayerPostThink =
 	else if (self.impulse == 38)
 		client_responsetime_set();
 
-	SetPositions();
+	// Put all the projectile entities back to their actual (server) positions
+	antilag_restore_projectiles("missile");
+	antilag_restore_projectiles("spike");
+
+	// Update stored positions used for antilag
+	SetPositions(self);
+	SetProjectilePositions("missile");
+	SetProjectilePositions("spike");
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
