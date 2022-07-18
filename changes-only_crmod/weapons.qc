@@ -24,7 +24,7 @@ void (entity e, float rewindtime) antilag_rewind =
   	setorigin(e, rewindorigin);
 }
 
-void (float pingtime, entity ignore) antilag_rewind_all =
+void (float pingtime, entity ignore) antilag_rewind_players =
 {
 	local entity player;
 
@@ -50,7 +50,7 @@ void (float pingtime, entity ignore) antilag_rewind_all =
 	}
 }
 
-void () antilag_restore_all =
+void () antilag_restore_players =
 {
 	local entity player;
   
@@ -74,7 +74,7 @@ inside FireBullets and W_FireLightning:
 
 //add this
 	// Use the client's response time to temporarily move all other player entities back in time
-	antilag_rewind_all(self.responsetime, self);
+	antilag_rewind_players(self.responsetime, self);
 
 	ClearMultiDamage ();
 	while (shotcount > 0)
@@ -91,4 +91,4 @@ inside FireBullets and W_FireLightning:
 
 //and this
 	// Put all the player entities back to their actual (server) positions
-	antilag_restore_all();
+	antilag_restore_players();
