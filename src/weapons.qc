@@ -270,9 +270,13 @@ void (float pingtime, entity ignore) antilag_rewind_all =
 	{
 		if (player.deadflag == DEAD_NO)
 		{
+			// Store the player's .origin off to a temporary .hold_origin
+			// Should this be inside the player != ignore check?
 			player.hold_origin = player.origin;
+			// Don't rewind self
 			if (player != ignore)
 			{
+				// Rewind the player entity back to timestamp_we_want
 				antilag_rewind(player, timestamp_we_want);
 			}
 		}
@@ -290,6 +294,7 @@ void () antilag_restore_all =
 	{
 		if (player.deadflag == DEAD_NO)
 		{
+			// Put everybody back where the server thinks they belong
 			setorigin(player, player.hold_origin);
 		}
 		player = find(player, classname, "player");
@@ -306,6 +311,7 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	src = self.origin + v_forward*10;
 	src_z = self.absmin_z + self.size_z * 0.7;
 
+	// Use the client's response time to temporarily move all other player entities back in time
 	antilag_rewind_all(self.responsetime, self);
 	ClearMultiDamage ();
 	while (shotcount > 0)
@@ -319,6 +325,7 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 		shotcount = shotcount - 1;
 	}
 	ApplyMultiDamage ();
+	// Put all the player entities back to their actual (server) positions
 	antilag_restore_all();
 };
 
@@ -558,6 +565,7 @@ void() W_FireLightning =
 
 	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
 
+	// Use the client's response time to temporarily move all other player entities back in time
 	antilag_rewind_all(self.responsetime, self);
 
 	org = self.origin + '0 0 16';
@@ -576,6 +584,7 @@ void() W_FireLightning =
 
 	LightningDamage (self.origin, trace_endpos + v_forward*4, self, 30);
 	
+	// Put all the player entities back to their actual (server) positions
 	antilag_restore_all();
 };
 
