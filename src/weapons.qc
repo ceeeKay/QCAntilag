@@ -236,24 +236,87 @@ void (entity e, float rewindtime) antilag_rewind =
 {
 	vector rewindorigin;
 
-	if (e.lastorigintime1 < rewindtime)
-		rewindorigin = e.lastorigin1;
-	else if (e.lastorigintime2 < rewindtime)
-		rewindorigin = e.lastorigin2;
-	else if (e.lastorigintime3 < rewindtime)
-		rewindorigin = e.lastorigin3;
-	else if (e.lastorigintime4 < rewindtime)
-		rewindorigin = e.lastorigin4;
-	else if (e.lastorigintime5 < rewindtime)
-		rewindorigin = e.lastorigin5;
-	else if (e.lastorigintime6 < rewindtime)
-		rewindorigin = e.lastorigin6;
-	else if (e.lastorigintime7 < rewindtime)
-		rewindorigin = e.lastorigin7;
-	else if (e.lastorigintime8 < rewindtime)
-		rewindorigin = e.lastorigin8;
-	else
-		rewindorigin = e.lastorigin9;
+	if (e.lastorigintime1 < rewindtime) {
+		if (e.lastorigintime1 == 0) {
+			rewindorigin = e.hold_origin;
+			// sprint(e.owner, "zero, rewinding to hold_origin\n");
+		} else {
+			rewindorigin = e.lastorigin1;
+			// sprint(e.owner, "rewinding to lastorigin1\n");
+		}
+	}
+	else if (e.lastorigintime2 < rewindtime) {
+		if (e.lastorigintime2 == 0) {
+			rewindorigin = e.lastorigin1;
+			// sprint(e.owner, "zero, rewinding to lastorigin1\n");
+		} else {
+			rewindorigin = e.lastorigin2;
+			// sprint(e.owner, "rewinding to lastorigin2\n");
+		}
+	}
+	else if (e.lastorigintime3 < rewindtime) {
+		if (e.lastorigintime3 == 0) {
+			rewindorigin = e.lastorigin2;
+			// sprint(e.owner, "zero, rewinding to lastorigin2\n");
+		} else {
+			rewindorigin = e.lastorigin3;
+			// sprint(e.owner, "rewinding to lastorigin3\n");
+		}
+	}
+	else if (e.lastorigintime4 < rewindtime) {
+		if (e.lastorigintime4 == 0) {
+			rewindorigin = e.lastorigin3;
+			// sprint(e.owner, "zero, rewinding to lastorigin3\n");
+		} else {
+			rewindorigin = e.lastorigin4;
+			// sprint(e.owner, "rewinding to lastorigin4\n");
+		}
+	}
+	else if (e.lastorigintime5 < rewindtime) {
+		if (e.lastorigintime5 == 0) {
+			rewindorigin = e.lastorigin4;
+			// sprint(e.owner, "zero, rewinding to lastorigin4\n");
+		} else {
+			rewindorigin = e.lastorigin5;
+			// sprint(e.owner, "rewinding to lastorigin5\n");
+		}
+	}
+	else if (e.lastorigintime6 < rewindtime) {
+		if (e.lastorigintime6 == 0) {
+			rewindorigin = e.lastorigin5;
+			// sprint(e.owner, "zero, rewinding to lastorigin5\n");
+		} else {
+			rewindorigin = e.lastorigin6;
+			// sprint(e.owner, "rewinding to lastorigin6\n");
+		}
+	}
+	else if (e.lastorigintime7 < rewindtime) {
+		if (e.lastorigintime7 == 0) {
+			rewindorigin = e.lastorigin6;
+			// sprint(e.owner, "zero, rewinding to lastorigin6\n");
+		} else {
+			rewindorigin = e.lastorigin7;
+			// sprint(e.owner, "rewinding to lastorigin7\n");
+		}
+	}
+	else if (e.lastorigintime8 < rewindtime) {
+		if (e.lastorigintime8 == 0) {
+			rewindorigin = e.lastorigin7;
+			// sprint(e.owner, "zero, rewinding to lastorigin7\n");
+		} else {
+			rewindorigin = e.lastorigin8;
+			// sprint(e.owner, "rewinding to lastorigin8\n");
+		}
+	}
+	else {
+		if (e.lastorigintime9 == 0) {
+			rewindorigin = e.lastorigin8;
+			// sprint(e.owner, "zero, rewinding to lastorigin8\n");
+		} else {
+			rewindorigin = e.lastorigin9;
+			// sprint(e.owner, "rewinding to lastorigin9\n");
+		}
+	}
 
   	setorigin(e, rewindorigin);
 }
