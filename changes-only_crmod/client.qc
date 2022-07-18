@@ -63,12 +63,6 @@ void () client_responsetime_show =
 //rotate player positions
 void () SetPositions =
 {
-	if (time > self.responsetimecheck)
-	{
-		self.responsetimecheck = (time + 10);
-		client_responsetime_get();
-	}
-
 	self.lastorigin9 = self.lastorigin8;
 	self.lastorigintime9 = self.lastorigintime8;
 	self.lastorigin8 = self.lastorigin7;
@@ -86,5 +80,5 @@ void () SetPositions =
 	self.lastorigin2 = self.lastorigin1;
 	self.lastorigintime2 = self.lastorigintime1;
 	self.lastorigin1 = self.origin;
-	self.lastorigintime1 = time;
+	self.lastorigintime1 = (time * 1000);
 };

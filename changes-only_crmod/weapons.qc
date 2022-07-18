@@ -28,7 +28,7 @@ void (float pingtime, entity ignore) antilag_rewind_all =
 {
 	local entity player;
 
-	float timestamp_we_want = (time - pingtime);
+	float timestamp_we_want = ((time * 1000) - pingtime);
   
 	player = find(world, classname, "player");
 
@@ -36,9 +36,13 @@ void (float pingtime, entity ignore) antilag_rewind_all =
 	{
 		if ((player.deadflag == DEAD_NO) && (player.style & ELOHIM_CONNECTED) && !(player.style & ELOHIM_OBSERVER))
 		{
+			// Store the player's .origin off to a temporary .hold_origin
+			// Should this be inside the player != ignore check?
 			player.hold_origin = player.origin;
+			// Don't rewind self
 			if (player != ignore)
 			{
+				// Rewind the player entity back to timestamp_we_want
 				antilag_rewind(player, timestamp_we_want);
 			}
 		}
@@ -56,6 +60,7 @@ void () antilag_restore_all =
 	{
 		if ((player.deadflag == DEAD_NO) && (player.style & ELOHIM_CONNECTED) && !(player.style & ELOHIM_OBSERVER))
 		{
+			// Put everybody back where the server thinks they belong
 			setorigin(player, player.hold_origin);
 		}
 		player = find(player, classname, "player");
@@ -65,9 +70,10 @@ void () antilag_restore_all =
 
 
 
-inside FireBullets:
+inside FireBullets and W_FireLightning:
 
 //add this
+	// Use the client's response time to temporarily move all other player entities back in time
 	antilag_rewind_all(self.responsetime, self);
 
 	ClearMultiDamage ();
@@ -84,4 +90,5 @@ inside FireBullets:
 	ApplyMultiDamage ();
 
 //and this
+	// Put all the player entities back to their actual (server) positions
 	antilag_restore_all();
