@@ -807,6 +807,14 @@ void(vector org, vector dir) launch_spike =
 	setorigin (newmis, org);
 
 	newmis.velocity = dir * 1000;
+
+	if (self.classname == "player"){
+		// set .responsetime to owner's so position can be compensated for antilag
+		newmis.responsetime = self.responsetime;
+		// sprint(self, "launching spike! response time ");
+		// sprint(self, ftos(newmis.responsetime));
+		// sprint(self, "\n");
+	}
 };
 
 void() W_FireSuperSpikes =
