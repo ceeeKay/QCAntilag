@@ -1123,6 +1123,8 @@ void() CheckPowerups =
 void () client_ping_think =
 {
     local entity client;
+	// Pretend to have some extra latency for testing
+	local float faketime = 0; // e.g. 100
 
     client = find(world, classname, "player");
     while (client)
@@ -1131,7 +1133,7 @@ void () client_ping_think =
 		client.responsetime2 = client.responsetime1;
 
 		if (client.finaldest_y > self.finaldest_x)
-			client.responsetime1 = (floor(client.finaldest_y - self.finaldest_x) - 16);
+			client.responsetime1 = (floor(client.finaldest_y - self.finaldest_x) - 16) + faketime;
 		else
 			client.responsetime1 = ANTILAG_MAX_RESPONSETIME;
 
