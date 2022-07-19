@@ -21,4 +21,8 @@
 .float responsetime1;
 .float responsetime2;
 .float responsetime3;
-.float responsetimecheck;
+.float spamtime;
+
+float responsetimecheck;
+float ANTILAG_MAX_RESPONSETIME = 150;
+float SVC_STUFFTEXT = 9;

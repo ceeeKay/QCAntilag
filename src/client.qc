@@ -1244,7 +1244,7 @@ void () client_responsetime_show =
 };
 
 //rotate player positions
-void () SetPositions =
+void () UpdateLastOrigin =
 {
 	self.lastorigin9 = self.lastorigin8;
 	self.lastorigintime9 = self.lastorigintime8;
@@ -1280,7 +1280,7 @@ void() PlayerPostThink =
 	else if (self.impulse == 38)
 		client_responsetime_set();
 
-	SetPositions();
+	UpdateLastOrigin();
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale

@@ -271,7 +271,6 @@ void (float pingtime, entity ignore) antilag_rewind_players =
 		if (player.deadflag == DEAD_NO)
 		{
 			// Store the player's .origin off to a temporary .hold_origin
-			// Should this be inside the player != ignore check?
 			player.hold_origin = player.origin;
 			// Don't rewind self
 			if (player != ignore)
@@ -436,9 +435,9 @@ void() T_MissileTouch =
 	BecomeExplosion ();
 };
 
-void ThinkMovetype_Projectile()
+void ThinkMovetype_AntilagProjectile()
 {
-	self.think = ThinkMovetype_Projectile;
+	self.think = ThinkMovetype_AntilagProjectile;
 	self.nextthink = time + 0.01;
 
 	// Use the client's response time to temporarily move all other player entities back in time
@@ -529,7 +528,7 @@ void() W_FireRocket =
 
 	// use custom a movement .think
 	missile.movetype = MOVETYPE_NONE;
-	missile.think = ThinkMovetype_Projectile;
+	missile.think = ThinkMovetype_AntilagProjectile;
 	missile.nextthink = time + 0.01;
 
 	// set .responsetime to owner's so position can be compensated for antilag
@@ -768,7 +767,7 @@ void(vector org, vector dir) launch_spike =
 	if (self.classname == "player") {
 		// use custom a movement .think
 		newmis.movetype = MOVETYPE_NONE;
-		newmis.think = ThinkMovetype_Projectile;
+		newmis.think = ThinkMovetype_AntilagProjectile;
 		newmis.nextthink = time + 0.01;
 
 		// set .responsetime to owner's so position can be compensated for antilag
@@ -777,10 +776,10 @@ void(vector org, vector dir) launch_spike =
 		// store the physics versino of the missile's location
 		newmis.hold_origin = newmis.origin;
 
-		// Run ThinkMovetype_Projectile once manually for high ping players
+		// Run ThinkMovetype_AntilagProjectile once manually for high ping players
 		entity tmp = self;
 		self = newmis;
-		ThinkMovetype_Projectile();
+		ThinkMovetype_AntilagProjectile();
 		self = tmp;
 	}
 };

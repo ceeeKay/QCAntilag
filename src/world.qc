@@ -350,7 +350,7 @@ void antilag_restore_projectiles(string class)
 
 	while (projectile)
 	{
-		if (projectile.think != ThinkMovetype_Projectile) {
+		if (projectile.think != ThinkMovetype_AntilagProjectile) {
 			projectile = find(projectile, classname, class);
 			continue;
 		}
