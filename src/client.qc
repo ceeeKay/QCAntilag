@@ -511,7 +511,7 @@ void() PutClientInServer =
 	self.invincible_finished = 0;
 	self.effects = 0;
 	self.invincible_time = 0;
-    
+
     // Set players all on the same team so bots don't target you
     if(coop)
         self.team = 1;
@@ -1178,7 +1178,7 @@ void () client_responsetime_show =
 	//don't let players spam this
 	if (time < self.spamtime)
 		return;
-		
+
 	self.spamtime = (time + 5);
 
     sprint(self, "response time3: ");

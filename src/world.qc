@@ -366,7 +366,7 @@ void() StartFrame =
 	teamplay = cvar("teamplay");
 	skill = cvar("skill");
 	framecount = framecount + 1;
-	
+
 	if (time > responsetimecheck)
 	{
 		responsetimecheck = (time + 10);
