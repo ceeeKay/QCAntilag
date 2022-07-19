@@ -776,6 +776,12 @@ void(vector org, vector dir) launch_spike =
 
 		// store the physics versino of the missile's location
 		newmis.hold_origin = newmis.origin;
+
+		// Run ThinkMovetype_Projectile once manually for high ping players
+		entity tmp = self;
+		self = newmis;
+		ThinkMovetype_Projectile();
+		self = tmp;
 	}
 };
 
