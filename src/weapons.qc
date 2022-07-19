@@ -258,7 +258,7 @@ void (entity e, float rewindtime) antilag_rewind =
   	setorigin(e, rewindorigin);
 }
 
-void (float pingtime, entity ignore) antilag_rewind_all =
+void (float pingtime, entity ignore) antilag_rewind_players =
 {
 	local entity player;
 
@@ -284,7 +284,7 @@ void (float pingtime, entity ignore) antilag_rewind_all =
 	}
 }
 
-void () antilag_restore_all =
+void () antilag_restore_players =
 {
 	local entity player;
   
@@ -312,7 +312,7 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	src_z = self.absmin_z + self.size_z * 0.7;
 
 	// Use the client's response time to temporarily move all other player entities back in time
-	antilag_rewind_all(self.responsetime, self);
+	antilag_rewind_players(self.responsetime, self);
 	ClearMultiDamage ();
 	while (shotcount > 0)
 	{
@@ -326,7 +326,7 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	}
 	ApplyMultiDamage ();
 	// Put all the player entities back to their actual (server) positions
-	antilag_restore_all();
+	antilag_restore_players();
 };
 
 /*
@@ -442,7 +442,7 @@ void ThinkMovetype_Projectile()
 	self.nextthink = time + 0.01;
 
 	// Use the client's response time to temporarily move all other player entities back in time
-	antilag_rewind_all(self.responsetime, self.owner);
+	antilag_rewind_players(self.responsetime, self.owner);
 
 	// Trace a line from current position to the place where we'll be after the next frame
 	traceline(self.origin, self.origin + (self.velocity * frametime), FALSE, self);
@@ -473,7 +473,7 @@ void ThinkMovetype_Projectile()
 	}
 
 	// Put all the player entities back to their actual (server) positions
-	antilag_restore_all();
+	antilag_restore_players();
 }
 
 /*
@@ -608,7 +608,7 @@ void() W_FireLightning =
 	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
 
 	// Use the client's response time to temporarily move all other player entities back in time
-	antilag_rewind_all(self.responsetime, self);
+	antilag_rewind_players(self.responsetime, self);
 
 	org = self.origin + '0 0 16';
 
@@ -627,7 +627,7 @@ void() W_FireLightning =
 	LightningDamage (self.origin, trace_endpos + v_forward*4, self, 30);
 
 	// Put all the player entities back to their actual (server) positions
-	antilag_restore_all();
+	antilag_restore_players();
 };
 
 
