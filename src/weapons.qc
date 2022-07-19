@@ -448,7 +448,6 @@ void ThinkMovetype_Projectile()
 	traceline(self.origin, self.origin + (self.velocity * frametime), FALSE, self);
 
 	// Actually move the missile
-	// self.origin = trace_endpos;
 	setorigin(self, trace_endpos);
 
 	// If we run into something
@@ -474,6 +473,18 @@ void ThinkMovetype_Projectile()
 
 	// Put all the player entities back to their actual (server) positions
 	antilag_restore_players();
+
+	// Extrapolate the visual antilagged position to send to clients;
+	// our physics position will be stored in hold_origin.
+	local float extrapolation_time;
+	// Start with where the game physics think we should be
+	self.hold_origin = self.origin;
+	// Cap extrapolation at our max rewind time
+	extrapolation_time = self.responsetime > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : self.responsetime;
+	// Make sure to multiply by 0.001 to convert into seconds for desired velocity
+	traceline(self.origin, self.origin + (self.velocity * extrapolation_time * 0.001), FALSE, self);
+	// Move to the extrapolated position for good visuals
+	setorigin(self, trace_endpos);
 }
 
 /*
@@ -493,7 +504,7 @@ void() W_FireRocket =
 
 	missile = spawn ();
 	missile.owner = self;
-	missile.movetype = MOVETYPE_NONE;
+	missile.movetype = MOVETYPE_FLYMISSILE;
 	missile.solid = SOLID_BBOX;
 	missile.classname = "missile";
 
@@ -506,17 +517,26 @@ void() W_FireRocket =
 
 	missile.touch = T_MissileTouch;
 
-	// set .responsetime to owner's so position can be compensated for antilag
-		missile.responsetime = self.responsetime;
-
-	// TODO decide if we need a SUB_Remove for missiles that stick around for 5 seconds somehow
-	missile.think = ThinkMovetype_Projectile;
-	missile.nextthink = time + 0.01;
-
+// set missile duration
+	missile.nextthink = time + 5;
+	missile.think = SUB_Remove;
 
 	setmodel (missile, "progs/missile.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
 	setorigin (missile, self.origin + v_forward*8 + '0 0 16');
+
+// antilag
+
+	// use custom a movement .think
+	missile.movetype = MOVETYPE_NONE;
+	missile.think = ThinkMovetype_Projectile;
+	missile.nextthink = time + 0.01;
+
+	// set .responsetime to owner's so position can be compensated for antilag
+	missile.responsetime = self.responsetime;
+
+	// store the physics version of the missile's location
+	missile.hold_origin = missile.origin;
 };
 
 /*
@@ -743,12 +763,19 @@ void(vector org, vector dir) launch_spike =
 
 	newmis.velocity = dir * 1000;
 
+// antilag
+
 	if (self.classname == "player") {
+		// use custom a movement .think
+		newmis.movetype = MOVETYPE_NONE;
+		newmis.think = ThinkMovetype_Projectile;
+		newmis.nextthink = time + 0.01;
+
 		// set .responsetime to owner's so position can be compensated for antilag
 		newmis.responsetime = self.responsetime;
 
-		newmis.think = ThinkMovetype_Projectile;
-		newmis.nextthink = time + 0.01;
+		// store the physics versino of the missile's location
+		newmis.hold_origin = newmis.origin;
 	}
 };
 
