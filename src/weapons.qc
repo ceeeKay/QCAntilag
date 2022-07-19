@@ -436,7 +436,45 @@ void() T_MissileTouch =
 	BecomeExplosion ();
 };
 
+void ThinkMovetype_Projectile()
+{
+	self.think = ThinkMovetype_Projectile;
+	self.nextthink = time + 0.01;
 
+	// Use the client's response time to temporarily move all other player entities back in time
+	antilag_rewind_all(self.responsetime, self.owner);
+
+	// Trace a line from current position to the place where we'll be after the next frame
+	traceline(self.origin, self.origin + (self.velocity * frametime), FALSE, self);
+
+	// Actually move the missile
+	// self.origin = trace_endpos;
+	setorigin(self, trace_endpos);
+
+	// If we run into something
+	if (trace_fraction < 1)
+	{
+		// Call T_MissileTouch()
+		if (self.touch)
+		{
+			other = trace_ent;
+			self.touch();
+		}
+
+		// Call the other entity's .touch function (if it has one)
+		if (trace_ent && trace_ent.touch)
+		{
+			entity oself = self;
+			other = self;
+			self = trace_ent;
+			self.touch();
+			self = oself;
+		}
+	}
+
+	// Put all the player entities back to their actual (server) positions
+	antilag_restore_all();
+}
 
 /*
 ================
@@ -455,7 +493,7 @@ void() W_FireRocket =
 
 	missile = spawn ();
 	missile.owner = self;
-	missile.movetype = MOVETYPE_FLYMISSILE;
+	missile.movetype = MOVETYPE_NONE;
 	missile.solid = SOLID_BBOX;
 	missile.classname = "missile";
 
@@ -468,9 +506,13 @@ void() W_FireRocket =
 
 	missile.touch = T_MissileTouch;
 
-// set missile duration
-	missile.nextthink = time + 5;
-	missile.think = SUB_Remove;
+	// set .responsetime to owner's so position can be compensated for antilag
+		missile.responsetime = self.responsetime;
+
+	// TODO decide if we need a SUB_Remove for missiles that stick around for 5 seconds somehow
+	missile.think = ThinkMovetype_Projectile;
+	missile.nextthink = time + 0.01;
+
 
 	setmodel (missile, "progs/missile.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
@@ -583,7 +625,7 @@ void() W_FireLightning =
 	WriteCoord (MSG_BROADCAST, trace_endpos_z);
 
 	LightningDamage (self.origin, trace_endpos + v_forward*4, self, 30);
-	
+
 	// Put all the player entities back to their actual (server) positions
 	antilag_restore_all();
 };
@@ -700,6 +742,14 @@ void(vector org, vector dir) launch_spike =
 	setorigin (newmis, org);
 
 	newmis.velocity = dir * 1000;
+
+	if (self.classname == "player") {
+		// set .responsetime to owner's so position can be compensated for antilag
+		newmis.responsetime = self.responsetime;
+
+		newmis.think = ThinkMovetype_Projectile;
+		newmis.nextthink = time + 0.01;
+	}
 };
 
 void() W_FireSuperSpikes =
