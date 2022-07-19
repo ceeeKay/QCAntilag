@@ -13,7 +13,7 @@
         {
             "label": "compile and package as pak0.pak",
             "type": "shell",
-            "command": "cd src; fteqcc64; cd ..; qpakman progs.dat spawns -o pak0.pak",
+            "command": "cd src; fteqcc64; cd ..; qpakman progs.dat -o pak0.pak",
             "problemMatcher": [],
             "group": "build"
         },
