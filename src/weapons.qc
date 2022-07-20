@@ -236,6 +236,14 @@ void (entity e, float rewindtime) antilag_rewind =
 {
 	vector rewindorigin;
 
+	float i;
+	for(i = 0; i < ANTILAG_STATES; i++)
+	{
+		if (e.lastorigintime[i] < rewindtime)
+			rewindorigin = e.lastorigin[i];
+	}
+	
+	/*
 	if (e.lastorigintime1 < rewindtime)
 		rewindorigin = e.lastorigin1;
 	else if (e.lastorigintime2 < rewindtime)
@@ -254,6 +262,7 @@ void (entity e, float rewindtime) antilag_rewind =
 		rewindorigin = e.lastorigin8;
 	else
 		rewindorigin = e.lastorigin9;
+	*/
 
   	setorigin(e, rewindorigin);
 }
@@ -435,16 +444,42 @@ void() T_MissileTouch =
 	BecomeExplosion ();
 };
 
+
+void Extrapolate_AntilagProjectile(entity missile)
+{
+	// Extrapolate the visual antilagged position to send to clients;
+	// our physics position will be stored in hold_origin.
+	local float extrapolation_time;
+	// Cap extrapolation at our max rewind time
+	extrapolation_time = missile.responsetime > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : missile.responsetime;
+	// Make sure to multiply by 0.001 to convert into seconds for desired velocity
+	traceline(missile.origin, missile.origin + (missile.velocity * extrapolation_time * 0.001), FALSE, missile);
+	// Move to the extrapolated position for good visuals
+	setorigin(missile, trace_endpos);
+}
+
+
 void ThinkMovetype_AntilagProjectile()
 {
 	self.think = ThinkMovetype_AntilagProjectile;
 	self.nextthink = time + 0.01;
+	
+	setorigin(self, self.hold_origin);
+	
+	// If our SSQC is running at hyper fast framerate for some reason (FTE)
+	local float delta = frametime;
+	if (is_running_fte)
+	{
+		if (cvar("sv_gameplayfix_multiplethinks"))
+			delta = 0.01;
+	}
 
+	
 	// Use the client's response time to temporarily move all other player entities back in time
 	antilag_rewind_players(self.responsetime, self.owner);
 
 	// Trace a line from current position to the place where we'll be after the next frame
-	traceline(self.origin, self.origin + (self.velocity * frametime), FALSE, self);
+	traceline(self.origin, self.origin + (self.velocity * delta), FALSE, self);
 
 	// Actually move the missile
 	setorigin(self, trace_endpos);
@@ -472,18 +507,12 @@ void ThinkMovetype_AntilagProjectile()
 
 	// Put all the player entities back to their actual (server) positions
 	antilag_restore_players();
-
-	// Extrapolate the visual antilagged position to send to clients;
-	// our physics position will be stored in hold_origin.
-	local float extrapolation_time;
-	// Start with where the game physics think we should be
+	
+	// Track our true position
 	self.hold_origin = self.origin;
-	// Cap extrapolation at our max rewind time
-	extrapolation_time = self.responsetime > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : self.responsetime;
-	// Make sure to multiply by 0.001 to convert into seconds for desired velocity
-	traceline(self.origin, self.origin + (self.velocity * extrapolation_time * 0.001), FALSE, self);
-	// Move to the extrapolated position for good visuals
-	setorigin(self, trace_endpos);
+	
+	// Run extrapolation
+	Extrapolate_AntilagProjectile(self);
 }
 
 /*
@@ -525,17 +554,23 @@ void() W_FireRocket =
 	setorigin (missile, self.origin + v_forward*8 + '0 0 16');
 
 // antilag
+	
+	if (self.flags & FL_CLIENT)
+	{
+		// use custom a movement .think
+		missile.movetype = MOVETYPE_NONE;
+		missile.think = ThinkMovetype_AntilagProjectile;
+		missile.nextthink = time + 0.01;
 
-	// use custom a movement .think
-	missile.movetype = MOVETYPE_NONE;
-	missile.think = ThinkMovetype_AntilagProjectile;
-	missile.nextthink = time + 0.01;
+		// set .responsetime to owner's so position can be compensated for antilag
+		missile.responsetime = self.responsetime;
 
-	// set .responsetime to owner's so position can be compensated for antilag
-	missile.responsetime = self.responsetime;
-
-	// store the physics version of the missile's location
-	missile.hold_origin = missile.origin;
+		// store the physics version of the missile's location
+		missile.hold_origin = missile.origin;
+		
+		// run extrapolation, so for QW clients we avoid visual strange-ness
+		Extrapolate_AntilagProjectile(missile);
+	}
 };
 
 /*
@@ -761,27 +796,6 @@ void(vector org, vector dir) launch_spike =
 	setorigin (newmis, org);
 
 	newmis.velocity = dir * 1000;
-
-// antilag
-
-	if (self.classname == "player") {
-		// use custom a movement .think
-		newmis.movetype = MOVETYPE_NONE;
-		newmis.think = ThinkMovetype_AntilagProjectile;
-		newmis.nextthink = time + 0.01;
-
-		// set .responsetime to owner's so position can be compensated for antilag
-		newmis.responsetime = self.responsetime;
-
-		// store the physics versino of the missile's location
-		newmis.hold_origin = newmis.origin;
-
-		// Run ThinkMovetype_AntilagProjectile once manually for high ping players
-		entity tmp = self;
-		self = newmis;
-		ThinkMovetype_AntilagProjectile();
-		self = tmp;
-	}
 };
 
 void() W_FireSuperSpikes =
@@ -797,6 +811,32 @@ void() W_FireSuperSpikes =
 	setmodel (newmis, "progs/s_spike.mdl");
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
 	self.punchangle_x = -2;
+	
+	
+	
+	// antilag
+	if (self.flags & FL_CLIENT)
+	{
+		// use custom a movement .think
+		newmis.movetype = MOVETYPE_NONE;
+		newmis.think = ThinkMovetype_AntilagProjectile;
+		newmis.nextthink = time + 0.01;
+
+		// set .responsetime to owner's so position can be compensated for antilag
+		newmis.responsetime = self.responsetime;
+
+		// store the physics versino of the missile's location
+		newmis.hold_origin = newmis.origin;
+
+		// Run ThinkMovetype_AntilagProjectile once to match newmis behavior
+		float old_frametime = frametime;
+		frametime = 0.01667;
+		entity tmp = self;
+		self = newmis;
+		ThinkMovetype_AntilagProjectile();
+		self = tmp;
+		frametime = old_frametime;
+	}
 };
 
 void(float ox) W_FireSpikes =
@@ -825,6 +865,32 @@ void(float ox) W_FireSpikes =
 	launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
 
 	self.punchangle_x = -2;
+	
+	
+	
+	// antilag
+	if (self.flags & FL_CLIENT)
+	{
+		// use custom a movement .think
+		newmis.movetype = MOVETYPE_NONE;
+		newmis.think = ThinkMovetype_AntilagProjectile;
+		newmis.nextthink = time + 0.01;
+
+		// set .responsetime to owner's so position can be compensated for antilag
+		newmis.responsetime = self.responsetime;
+
+		// store the physics versino of the missile's location
+		newmis.hold_origin = newmis.origin;
+		
+		// Run ThinkMovetype_AntilagProjectile once to match newmis behavior
+		float old_frametime = frametime;
+		frametime = 0.01667;
+		entity tmp = self;
+		self = newmis;
+		ThinkMovetype_AntilagProjectile();
+		self = tmp;
+		frametime = old_frametime;
+	}
 };
 
 

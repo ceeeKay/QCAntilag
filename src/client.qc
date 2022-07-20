@@ -1126,10 +1126,10 @@ void () client_ping_think =
 		client.responsetime3 = client.responsetime2;
 		client.responsetime2 = client.responsetime1;
 
-		if (client.finaldest_y > self.finaldest_x)
+		if (client.finaldest_y > self.finaldest_x && (client.finaldest_y - self.finaldest_x) < 400) // if we got a packed back, and it's not insanely high
 			client.responsetime1 = (floor(client.finaldest_y - self.finaldest_x) - 16);
 		else
-			client.responsetime1 = ANTILAG_MAX_RESPONSETIME;
+			client.responsetime1 = client.responsetime;
 
 		if (client.responsetime2 > 0)
 		{
@@ -1154,8 +1154,20 @@ void () client_ping_think =
 
 void () client_responsetime_get_all =
 {
+	if (is_running_fte) // if we're on FTE, we can use the QW way
+	{
+		for(entity pl = find(world, classname, "player"); pl; pl = find(pl, classname, "player"))
+		{
+			pl.responsetime = infokeyf(pl, "ping") - 8; // account for QW input frame timey-ness
+			pl.responsetime = pl.responsetime > 0 ? pl.responsetime : 0;
+		}
+		
+		responsetimecheck = (time + 3); // we're using engine stuff, so we can speed this polling up a bit
+		return;
+	}
+	
     local entity ping;
-
+	
     WriteByte(MSG_BROADCAST, SVC_STUFFTEXT);
     WriteString(MSG_BROADCAST, "impulse 38\n");
 

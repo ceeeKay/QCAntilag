@@ -776,5 +776,11 @@ float(entity targ, entity inflictor) CanDamage;
 .float responsetime3;
 .float spamtime;
 
+ // this stuff is only valid in FTE or another QW compatible engine
+.void() customphysics;
+float(entity e, string key) infokeyf = #0:infokeyf;
+//
+
+float is_running_fte;
 float responsetimecheck;
 float SVC_STUFFTEXT = 9;
