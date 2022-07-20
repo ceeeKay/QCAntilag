@@ -1165,6 +1165,8 @@ void () client_responsetime_get_all =
     ping.nextthink = time + 2;
     ping.think = client_ping_think;
     ping.finaldest_x = (time * 1000);
+	
+	responsetimecheck = (time + 10);
 };
 
 void () client_responsetime_set =
@@ -1196,74 +1198,33 @@ void () client_responsetime_show =
     sprint(self, "current origin: ");
 	sprint(self, vtos(self.origin));
 	sprint(self, "\n");
-    sprint(self, "last frame1: ");
-	sprint(self, vtos(self.lastorigin1));
-	sprint(self, " ");
-	sprint(self, ftos(self.lastorigintime1));
-	sprint(self, "\n");
-    sprint(self, "last frame2: ");
-	sprint(self, vtos(self.lastorigin2));
-	sprint(self, " ");
-	sprint(self, ftos(self.lastorigintime2));
-	sprint(self, "\n");
-    sprint(self, "last frame3: ");
-	sprint(self, vtos(self.lastorigin3));
-	sprint(self, " ");
-	sprint(self, ftos(self.lastorigintime3));
-	sprint(self, "\n");
-    sprint(self, "last frame4: ");
-	sprint(self, vtos(self.lastorigin4));
-	sprint(self, " ");
-	sprint(self, ftos(self.lastorigintime4));
-	sprint(self, "\n");
-    sprint(self, "last frame5: ");
-	sprint(self, vtos(self.lastorigin5));
-	sprint(self, " ");
-	sprint(self, ftos(self.lastorigintime5));
-	sprint(self, "\n");
-    sprint(self, "last frame6: ");
-	sprint(self, vtos(self.lastorigin6));
-	sprint(self, " ");
-	sprint(self, ftos(self.lastorigintime6));
-	sprint(self, "\n");
-    sprint(self, "last frame7: ");
-	sprint(self, vtos(self.lastorigin7));
-	sprint(self, " ");
-	sprint(self, ftos(self.lastorigintime7));
-	sprint(self, "\n");
-    sprint(self, "last frame8: ");
-	sprint(self, vtos(self.lastorigin8));
-	sprint(self, " ");
-	sprint(self, ftos(self.lastorigintime8));
-	sprint(self, "\n");
-    sprint(self, "last frame9: ");
-	sprint(self, vtos(self.lastorigin9));
-	sprint(self, " ");
-	sprint(self, ftos(self.lastorigintime9));
-	sprint(self, "\n");
+	
+	float i;
+	for(i = 0; i < ANTILAG_STATES; i++)
+	{
+		sprint(self, "last frame");
+		sprint(self, ftos(i));
+		sprint(self, ": ");
+		sprint(self, vtos(self.lastorigin[i]));
+		sprint(self, " ");
+		sprint(self, ftos(self.lastorigintime[i]));
+		sprint(self, "\n");
+	}
 };
 
 //rotate player positions
 void () UpdateLastOrigin =
 {
-	self.lastorigin9 = self.lastorigin8;
-	self.lastorigintime9 = self.lastorigintime8;
-	self.lastorigin8 = self.lastorigin7;
-	self.lastorigintime8 = self.lastorigintime7;
-	self.lastorigin7 = self.lastorigin6;
-	self.lastorigintime7 = self.lastorigintime6;
-	self.lastorigin6 = self.lastorigin5;
-	self.lastorigintime6 = self.lastorigintime5;
-	self.lastorigin5 = self.lastorigin4;
-	self.lastorigintime5 = self.lastorigintime4;
-	self.lastorigin4 = self.lastorigin3;
-	self.lastorigintime4 = self.lastorigintime3;
-	self.lastorigin3 = self.lastorigin2;
-	self.lastorigintime3 = self.lastorigintime2;
-	self.lastorigin2 = self.lastorigin1;
-	self.lastorigintime2 = self.lastorigintime1;
-	self.lastorigin1 = self.origin;
-	self.lastorigintime1 = (time * 1000);
+	// push array towards the end, this could be replaced with a circular buffer
+	float i;
+	for(i = ANTILAG_STATES-1; i > 0; i--)
+	{
+		self.lastorigin[i] = self.lastorigin[i-1];
+		self.lastorigintime[i] = self.lastorigintime[i-1];
+	}
+	
+	self.lastorigin[0] = self.origin;
+	self.lastorigintime[0] = (time * 1000);
 };
 
 /*
@@ -1279,8 +1240,13 @@ void() PlayerPostThink =
 		client_responsetime_show();
 	else if (self.impulse == 38)
 		client_responsetime_set();
-
-	UpdateLastOrigin();
+	
+	// incase client is running at very high fps, keep this reined in.
+	if (time > self.antilag_updatetime)
+	{
+		UpdateLastOrigin();
+		self.antilag_updatetime = time + 0.01;
+	}
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
