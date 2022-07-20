@@ -764,7 +764,6 @@ float(entity targ, entity inflictor) CanDamage;
 #define ANTILAG_MASK				0x0F
 #define	ANTILAG_MAX_RESPONSETIME	150
 
-// QCAntilag: entity properties
 .vector lastorigin[ANTILAG_STATES];
 .float	lastorigintime[ANTILAG_STATES];
 .float	antilag_updatetime;
