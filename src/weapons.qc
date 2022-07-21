@@ -245,27 +245,6 @@ void (entity e, float rewindtime) antilag_rewind =
 			break;
 		}
 	}
-	
-	/*
-	if (e.lastorigintime1 < rewindtime)
-		rewindorigin = e.lastorigin1;
-	else if (e.lastorigintime2 < rewindtime)
-		rewindorigin = e.lastorigin2;
-	else if (e.lastorigintime3 < rewindtime)
-		rewindorigin = e.lastorigin3;
-	else if (e.lastorigintime4 < rewindtime)
-		rewindorigin = e.lastorigin4;
-	else if (e.lastorigintime5 < rewindtime)
-		rewindorigin = e.lastorigin5;
-	else if (e.lastorigintime6 < rewindtime)
-		rewindorigin = e.lastorigin6;
-	else if (e.lastorigintime7 < rewindtime)
-		rewindorigin = e.lastorigin7;
-	else if (e.lastorigintime8 < rewindtime)
-		rewindorigin = e.lastorigin8;
-	else
-		rewindorigin = e.lastorigin9;
-	*/
 
   	setorigin(e, rewindorigin);
 }
