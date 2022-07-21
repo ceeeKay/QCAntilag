@@ -1167,7 +1167,7 @@ void () client_responsetime_get_all =
 			pl.responsetime = infokeyf(pl, "ping") - 8; // account for QW input frame timey-ness
 			
 			// cap to acceptable values
-			pl.responsetime1 = pl.responsetime1 < 0 ? 0 : pl.responsetime;
+			pl.responsetime = pl.responsetime < 0 ? 0 : pl.responsetime;
 			pl.responsetime = pl.responsetime > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : pl.responsetime;
 		}
 		
