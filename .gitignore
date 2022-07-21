@@ -2,5 +2,7 @@
 *.zip
 *.exe
 *.log
-progs.dat
-progs.lno
+*.dat
+*.lno
+config.cfg
+fte.cfg
