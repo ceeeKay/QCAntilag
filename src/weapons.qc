@@ -449,7 +449,7 @@ void ThinkMovetype_AntilagProjectile()
 	local float delta = frametime;
 	if (is_running_fte)
 	{
-		if (cvar("sv_gameplayfix_multiplethinks"))
+		if (cvar("sv_gameplayfix_multiplethinks") || delta < 0.01)
 			delta = 0.01;
 	}
 
