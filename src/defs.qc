@@ -601,139 +601,7 @@ float	AS_MISSILE		= 4;
 .float		volume;
 
 
-
-
-//===========================================================================
-
-
-//
-// builtin functions
-//
-
-void(vector ang)	makevectors		= #1;		// sets v_forward, etc globals
-void(entity e, vector o) setorigin	= #2;
-void(entity e, string m) setmodel	= #3;		// set movetype and solid first
-void(entity e, vector min, vector max) setsize = #4;
-// #5 was removed
-void() break						= #6;
-float() random						= #7;		// returns 0 - 1
-void(entity e, float chan, string samp, float vol, float atten) sound = #8;
-vector(vector v) normalize			= #9;
-void(string e) error				= #10;
-void(string e) objerror				= #11;
-float(vector v) vlen				= #12;
-float(vector v) vectoyaw			= #13;
-entity() spawn						= #14;
-void(entity e) remove				= #15;
-
-// sets trace_* globals
-// nomonsters can be:
-// An entity will also be ignored for testing if forent == test,
-// forent->owner == test, or test->owner == forent
-// a forent of world is ignored
-void(vector v1, vector v2, float nomonsters, entity forent) traceline = #16;
-
-entity() checkclient				= #17;	// returns a client to look for
-entity(entity start, .string fld, string match) find = #18;
-string(string s) precache_sound		= #19;
-string(string s) precache_model		= #20;
-void(entity client, string s)stuffcmd = #21;
-entity(vector org, float rad) findradius = #22;
-void(string s) bprint				= #23;
-void(entity client, string s) sprint = #24;
-void(string s) dprint				= #25;
-string(float f) ftos				= #26;
-string(vector v) vtos				= #27;
-void() coredump						= #28;		// prints all edicts
-void() traceon						= #29;		// turns statment trace on
-void() traceoff						= #30;
-void(entity e) eprint				= #31;		// prints an entire edict
-float(float yaw, float dist) walkmove	= #32;	// returns TRUE or FALSE
-// #33 was removed
-float(optional float yaw, optional float dist) droptofloor= #34;	// TRUE if landed on floor
-void(float style, string value) lightstyle = #35;
-float(float v) rint					= #36;		// round to nearest int
-float(float v) floor				= #37;		// largest integer <= v
-float(float v) ceil					= #38;		// smallest integer >= v
-// #39 was removed
-float(entity e) checkbottom			= #40;		// true if self is on ground
-float(vector v) pointcontents		= #41;		// returns a CONTENT_*
-// #42 was removed
-float(float f) fabs = #43;
-vector(entity e, float speed) aim = #44;		// returns the shooting vector
-float(string s) cvar = #45;						// return cvar.value
-void(string s) localcmd = #46;					// put string into local que
-entity(entity e) nextent = #47;					// for looping through all ents
-void(vector o, vector d, float color, float count) particle = #48;// start a particle effect
-void() ChangeYaw = #49;						// turn towards self.ideal_yaw
-											// at self.yaw_speed
-// #50 was removed
-vector(vector v) vectoangles			= #51;
-
-//
-// direct client message generation
-//
-void(float to, float f) WriteByte		= #52;
-void(float to, float f) WriteChar		= #53;
-void(float to, float f) WriteShort		= #54;
-void(float to, float f) WriteLong		= #55;
-void(float to, float f) WriteCoord		= #56;
-void(float to, float f) WriteAngle		= #57;
-void(float to, string s) WriteString	= #58;
-void(float to, entity s) WriteEntity	= #59;
-
-//
-// broadcast client message generation
-//
-
-// void(float f) bWriteByte		= #59;
-// void(float f) bWriteChar		= #60;
-// void(float f) bWriteShort		= #61;
-// void(float f) bWriteLong		= #62;
-// void(float f) bWriteCoord		= #63;
-// void(float f) bWriteAngle		= #64;
-// void(string s) bWriteString	= #65;
-// void(entity e) bWriteEntity = #66;
-
-void(float step) movetogoal				= #67;
-
-string(string s) precache_file		= #68;	// no effect except for -copy
-void(entity e) makestatic		= #69;
-void(string s) changelevel = #70;
-
-//#71 was removed
-
-void(string var, string val) cvar_set = #72;	// sets cvar.value
-
-void(entity client, string s, optional string s1, optional string s2, optional string s3, optional string s4, optional string s5, optional string s6, optional string s7) centerprint = #73;	// sprint, but in middle
-
-void(vector pos, string samp, float vol, float atten) ambientsound = #74;
-
-string(string s) precache_model2	= #75;		// registered version only
-string(string s) precache_sound2	= #76;		// registered version only
-string(string s) precache_file2		= #77;		// registered version only
-
-void(entity e) setspawnparms		= #78;		// set parm1... to the
-												// values at level start
-												// for coop respawn
-
-void(entity killer, entity killee) finaleFinished = #79;
-string(entity e, string key) localsound = #80;
-void draw_point( vector point, float colormap, float lifetime, float depthtest ) = #81;
-void draw_line( vector start, vector end, float colormap, float lifetime, float depthtest ) = #82;
-void draw_arrow( vector start, vector end, float colormap, float size, float lifetime, float depthtest ) = #83;
-void draw_ray( vector start, vector direction, float length, float colormap, float size, float lifetime, float depthtest ) = #84;
-void draw_circle( vector origin, float radius, float colormap, float lifetime, float depthtest ) = #85;
-void draw_bounds( vector min, vector max, float colormap, float lifetime, float depthtest ) = #86;
-void draw_worldtext( string s, vector origin, float size, float lifetime, float depthtest ) = #87;
-void draw_sphere( vector origin, float radius, float colormap, float lifetime, float depthtest ) = #88;
-void draw_cylinder( vector origin, float halfHeight, float radius, float colormap, float lifetime, float depthtest ) = #89;
-
-void (entity client, string s, ...) centerprint2 = #90;
-void (string s,...) bprint2 = #91;
-void (entity client, string s, ...) sprint2 = #92;
-
-float(string extname) checkextension = #99;
+void(string mapname, optional string newmapstartspot) changelevel = #70;
 
 //============================================================================
 
@@ -775,6 +643,8 @@ float(entity targ, entity inflictor) CanDamage;
 .float responsetime2;
 .float responsetime3;
 .float spamtime;
+
+.float  csqc_enabled;
 
  // this stuff is only valid in FTE or another QW compatible engine
 .void() customphysics;

@@ -496,10 +496,12 @@ void() PutClientInServer =
 	spot = SelectSpawnPoint ();
 
 	self.classname = "player";
+	self.SendEntity = PL_SendEntity;
 	self.health = GetMaxHealth();
 	self.takedamage = DAMAGE_AIM;
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_WALK;
+	self.gravity = 1;
 	self.show_hostile = 0;
 	self.max_health = self.health;
 	self.flags = FL_CLIENT;
@@ -898,7 +900,7 @@ void() CheckWaterJump =
 		if (trace_fraction == 1)
 		{	// open at eye level
 			self.flags = self.flags | FL_WATERJUMP;
-			self.velocity_z = 225;
+			self.velocity_z = 260;
 			self.flags = self.flags - (self.flags & FL_JUMPRELEASED);
 			self.teleport_time = time + 2;	// safety net
 			return;
@@ -916,7 +918,11 @@ Called every frame before physics are run
 */
 void() PlayerPreThink =
 {
+	// Moved to PM_PlayerPreThink
+};
 
+void() PM_PlayerPreThink =
+{
 	if (intermission_running)
 	{
 		IntermissionThink ();	// otherwise a button could be missed between
@@ -943,13 +949,6 @@ void() PlayerPreThink =
 	if (self.deadflag == DEAD_DYING)
 		return;	// dying, so do nothing
 
-	if (self.button2)
-	{
-		PlayerJump ();
-	}
-	else
-		self.flags = self.flags | FL_JUMPRELEASED;
-
 // teleporters can force a non-moving pause time
 	if (time < self.pausetime)
 		self.velocity = '0 0 0';
@@ -959,7 +958,8 @@ void() PlayerPreThink =
 		self.weapon = W_BestWeapon ();
 		W_SetCurrentAmmo ();
 	}
-};
+}
+
 
 /*
 ================
@@ -1248,6 +1248,11 @@ Called every frame after physics are run
 */
 void() PlayerPostThink =
 {
+	// Moved to PM_PlayerPostThink
+}
+
+void() PM_PlayerPostThink =
+{
 	if (self.impulse == 37)
 		client_responsetime_show();
 	else if (self.impulse == 38)
@@ -1302,6 +1307,8 @@ called when a player connects to a server
 */
 void() ClientConnect =
 {
+	PM_ClientConnect();
+	
 	bprint (self.netname);
 	bprint (" entered the game\n");
 
@@ -1324,7 +1331,9 @@ void() ClientDisconnect =
 		return;
 	// if the level end trigger has been activated, just return
 	// since they aren't *really* leaving
-
+	
+	PM_ClientDisconnect();
+	
 	// let everyone else know
 	bprint (self.netname);
 	bprint (" left the game with ");

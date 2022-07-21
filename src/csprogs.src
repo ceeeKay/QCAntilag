@@ -1,0 +1,15 @@
+../csprogs.dat
+
+#define CSQC
+#define CSQC_SIMPLE
+
+cs/qsextensions.qc
+cs/defs.qc
+
+prediction/tools.qc
+prediction/pl_defs.qc
+prediction/pl_phys.qc
+prediction/pl_viewmodel.qc
+prediction/pl_net.qc
+
+cs/main.qc

@@ -1,5 +1,11 @@
 ../progs.dat
 
+#define SSQC
+#define NQSSQC
+
+#pragma sourcefile csprogs.src
+
+fteextensions.qc
 defs.qc
 subs.qc
 maps.qc
@@ -8,6 +14,12 @@ ai.qc
 combat.qc
 items.qc
 weapons.qc
+
+prediction/tools.qc
+prediction/pl_defs.qc
+prediction/pl_phys.qc
+prediction/pl_net.qc
+
 world.qc
 client.qc
 player.qc
