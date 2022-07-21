@@ -431,9 +431,8 @@ void Extrapolate_AntilagProjectile(entity missile)
 {
 	// Extrapolate the visual antilagged position to send to clients;
 	// our physics position will be stored in hold_origin.
-	local float extrapolation_time;
 	// Make sure to multiply by 0.001 to convert into seconds for desired velocity
-	traceline(missile.origin, missile.origin + (missile.velocity * extrapolation_time * 0.001), FALSE, missile);
+	traceline(missile.origin, missile.origin + (missile.velocity * missile.responsetime * 0.001), FALSE, missile);
 	// Move to the extrapolated position for good visuals
 	setorigin(missile, trace_endpos);
 }
