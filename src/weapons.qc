@@ -240,7 +240,10 @@ void (entity e, float rewindtime) antilag_rewind =
 	for(i = 0; i < ANTILAG_STATES; i++)
 	{
 		if (e.lastorigintime[i] < rewindtime)
+		{
 			rewindorigin = e.lastorigin[i];
+			break;
+		}
 	}
 	
 	/*
@@ -450,8 +453,6 @@ void Extrapolate_AntilagProjectile(entity missile)
 	// Extrapolate the visual antilagged position to send to clients;
 	// our physics position will be stored in hold_origin.
 	local float extrapolation_time;
-	// Cap extrapolation at our max rewind time
-	extrapolation_time = missile.responsetime > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : missile.responsetime;
 	// Make sure to multiply by 0.001 to convert into seconds for desired velocity
 	traceline(missile.origin, missile.origin + (missile.velocity * extrapolation_time * 0.001), FALSE, missile);
 	// Move to the extrapolated position for good visuals
