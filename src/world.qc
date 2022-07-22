@@ -188,7 +188,6 @@ void() worldspawn =
 		is_running_fte = checkextension("FTE_MULTIPROGS");
 	
 	if (is_running_fte)
-	{
 		cvar_set ("sv_gameplayfix_multiplethinks", "0");
 		cvar_set ("sv_mintic", "0.016667");
 		localcmd("serverinfo maxfps 60\n");
