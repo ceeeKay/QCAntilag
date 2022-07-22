@@ -1127,7 +1127,13 @@ void () client_ping_think =
 		client.responsetime2 = client.responsetime1;
 
 		if (client.finaldest_y > self.finaldest_x && (client.finaldest_y - self.finaldest_x) < 400) // if we got a packed back, and it's not insanely high
+		{
 			client.responsetime1 = (floor(client.finaldest_y - self.finaldest_x) - 16);
+			
+			// cap to acceptable values
+			client.responsetime1 = client.responsetime1 < 0 ? 0 : client.responsetime1;
+			client.responsetime1 = client.responsetime1 > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : client.responsetime1;
+		}
 		else
 			client.responsetime1 = client.responsetime;
 
@@ -1159,7 +1165,10 @@ void () client_responsetime_get_all =
 		for(entity pl = find(world, classname, "player"); pl; pl = find(pl, classname, "player"))
 		{
 			pl.responsetime = infokeyf(pl, "ping") - 8; // account for QW input frame timey-ness
-			pl.responsetime = pl.responsetime > 0 ? pl.responsetime : 0;
+			
+			// cap to acceptable values
+			pl.responsetime = pl.responsetime < 0 ? 0 : pl.responsetime;
+			pl.responsetime = pl.responsetime > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : pl.responsetime;
 		}
 		
 		responsetimecheck = (time + 3); // we're using engine stuff, so we can speed this polling up a bit

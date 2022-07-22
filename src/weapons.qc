@@ -240,29 +240,11 @@ void (entity e, float rewindtime) antilag_rewind =
 	for(i = 0; i < ANTILAG_STATES; i++)
 	{
 		if (e.lastorigintime[i] < rewindtime)
+		{
 			rewindorigin = e.lastorigin[i];
+			break;
+		}
 	}
-	
-	/*
-	if (e.lastorigintime1 < rewindtime)
-		rewindorigin = e.lastorigin1;
-	else if (e.lastorigintime2 < rewindtime)
-		rewindorigin = e.lastorigin2;
-	else if (e.lastorigintime3 < rewindtime)
-		rewindorigin = e.lastorigin3;
-	else if (e.lastorigintime4 < rewindtime)
-		rewindorigin = e.lastorigin4;
-	else if (e.lastorigintime5 < rewindtime)
-		rewindorigin = e.lastorigin5;
-	else if (e.lastorigintime6 < rewindtime)
-		rewindorigin = e.lastorigin6;
-	else if (e.lastorigintime7 < rewindtime)
-		rewindorigin = e.lastorigin7;
-	else if (e.lastorigintime8 < rewindtime)
-		rewindorigin = e.lastorigin8;
-	else
-		rewindorigin = e.lastorigin9;
-	*/
 
   	setorigin(e, rewindorigin);
 }
@@ -449,11 +431,8 @@ void Extrapolate_AntilagProjectile(entity missile)
 {
 	// Extrapolate the visual antilagged position to send to clients;
 	// our physics position will be stored in hold_origin.
-	local float extrapolation_time;
-	// Cap extrapolation at our max rewind time
-	extrapolation_time = missile.responsetime > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : missile.responsetime;
 	// Make sure to multiply by 0.001 to convert into seconds for desired velocity
-	traceline(missile.origin, missile.origin + (missile.velocity * extrapolation_time * 0.001), FALSE, missile);
+	traceline(missile.origin, missile.origin + (missile.velocity * missile.responsetime * 0.001), FALSE, missile);
 	// Move to the extrapolated position for good visuals
 	setorigin(missile, trace_endpos);
 }
@@ -470,7 +449,7 @@ void ThinkMovetype_AntilagProjectile()
 	local float delta = frametime;
 	if (is_running_fte)
 	{
-		if (cvar("sv_gameplayfix_multiplethinks"))
+		if (cvar("sv_gameplayfix_multiplethinks") || delta < 0.01)
 			delta = 0.01;
 	}
 
