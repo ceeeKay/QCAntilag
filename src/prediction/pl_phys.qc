@@ -1124,19 +1124,34 @@ void(float tleft) PL_BasicXerp
 void PM_ClientConnect()
 {
 	self.netquake_client = TRUE;
-	if (infokeyf(self, INFOKEY_P_CSQCACTIVE))
-		self.netquake_client = FALSE;
-	else if (strstrofs(infokey(self, "protocol"), "quakeworld") != -1)
-		self.netquake_client = FALSE;
-	
-	
-	
-	if (stof(infokey(self, "csqcactive")))		
+	if (infokeyf(self, INFOKEY_P_CSQCACTIVE)) // CSQC means we're always doing prediction
+	{
 		self.csqc_enabled |= CSQC_ENABLED;
+		self.netquake_client = FALSE;
+	}
+	else if (strstrofs(infokey(self, "protocol"), "quakeworld") != -1 || infokey(self, "protocol") == "qex666") // clients will force their own brand of prediction, hopefully they're close enough
+	{
+		self.netquake_client = FALSE;
+	}
 	
 	string client_engine = infokey(self, "*ver");
 	if (strstrofs(client_engine, "FTE", 0) == -1)
 		self.csqc_enabled |= CSQC_SHITTYENGINE;
+	
+	
+	sprint(self, "This server is using predictable NQ physics!\n");
+	if (self.netquake_client)
+	{
+		sprint(self, "You are connected with a NQ client, you will not have prediction.\n");
+	}
+	else if (self.csqc_enabled & CSQC_ENABLED)
+	{
+		sprint(self, "You are connected with a CSQC compatible client, you should have a smooth experience.\n");
+	}
+	else
+	{
+		sprint(self, "You are connected with a proprietary-prediction client, your experience may not be smooth when physics differences occur.\n");
+	}
 }
 
 
