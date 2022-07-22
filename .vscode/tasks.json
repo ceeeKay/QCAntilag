@@ -29,17 +29,17 @@
             "type": "shell",
             "command": "cd src; fteqcc64; cd ..; cp progs.dat C:/Program` Files` `(x86`)/Steam/steamapps/common/Quake/rerelease/id1",
             "problemMatcher": [],
-            "group": "build"
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         },
         {
             "label": "compile and copy progs.dat to \\Steam\\steamapps\\common\\Quake\\rerelease\\qeantilag",
             "type": "shell",
             "command": "cd src; fteqcc64; cd ..; cp progs.dat C:/Program` Files` `(x86`)/Steam/steamapps/common/Quake/rerelease/qeantilag",
             "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            "group": "build"
         }
     ]
 }
