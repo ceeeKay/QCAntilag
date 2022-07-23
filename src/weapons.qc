@@ -224,11 +224,7 @@ void(float damage, vector dir) TraceAttack =
 	}
 };
 
-/*
-================
-Antilag
-================
-*/
+// QCAntilag: Rewind an entity "e" to "rewindtime" to check for lag-compensated hits
 void (entity e, float rewindtime) antilag_rewind =
 {
 	vector rewindorigin;
@@ -261,6 +257,7 @@ void (entity e, float rewindtime) antilag_rewind =
   	setorigin(e, rewindorigin);
 }
 
+// QCAntilag: Rewind all players to "pingtime" except for player "ignore"
 void (float pingtime, entity ignore) antilag_rewind_players =
 {
 	local entity player;
@@ -286,6 +283,7 @@ void (float pingtime, entity ignore) antilag_rewind_players =
 	}
 }
 
+// QCAntilag: Restore all players' .origin back to where the server thinks they are
 void () antilag_restore_players =
 {
 	local entity player;
@@ -321,8 +319,9 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	src = self.origin + v_forward*10;
 	src_z = self.absmin_z + self.size_z * 0.7;
 
-	// Use the client's response time to temporarily move all other player entities back in time
+	// QCAntilag: Use the client's response time to temporarily move all other player entities back in time
 	antilag_rewind_players(self.responsetime, self);
+
 	ClearMultiDamage ();
 	while (shotcount > 0)
 	{
@@ -335,7 +334,8 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 		shotcount = shotcount - 1;
 	}
 	ApplyMultiDamage ();
-	// Put all the player entities back to their actual (server) positions
+
+	// QCAntilag: Put all the player entities back to their actual (server) positions
 	antilag_restore_players();
 };
 
@@ -446,18 +446,18 @@ void() T_MissileTouch =
 	BecomeExplosion ();
 };
 
-
+// QCAntilag: Extrapolate the visual antilagged position of projectiles to send to clients
 void Extrapolate_AntilagProjectile(entity missile)
 {
-	// Extrapolate the visual antilagged position to send to clients;
-	// our physics position will be stored in hold_origin.
+	// Original physics position should have been stored in missile.hold_origin already
+
 	// Make sure to multiply by 0.001 to convert into seconds for desired velocity
 	traceline(missile.origin, missile.origin + (missile.velocity * missile.responsetime * 0.001), FALSE, missile);
 	// Move to the extrapolated position for good visuals
 	setorigin(missile, trace_endpos);
 }
 
-
+// QCAntilag: .think function for antilag projectiles (i.e. rockets, nails/spikes)
 void ThinkMovetype_AntilagProjectile()
 {
 	self.think = ThinkMovetype_AntilagProjectile;
@@ -472,7 +472,6 @@ void ThinkMovetype_AntilagProjectile()
 		if (cvar("sv_gameplayfix_multiplethinks") || delta < 0.01)
 			delta = 0.01;
 	}
-
 	
 	// Use the client's response time to temporarily move all other player entities back in time
 	antilag_rewind_players(self.responsetime, self.owner);
@@ -552,8 +551,7 @@ void() W_FireRocket =
 	setsize (missile, '0 0 0', '0 0 0');
 	setorigin (missile, self.origin + v_forward*8 + '0 0 16');
 
-// antilag
-	
+// QCAntilag: Set up missile antilag properties
 	if (self.flags & FL_CLIENT)
 	{
 		// use custom a movement .think
@@ -660,7 +658,7 @@ void() W_FireLightning =
 
 	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
 
-	// Use the client's response time to temporarily move all other player entities back in time
+	// QCAntilag: Use the client's response time to temporarily move all other player entities back in time
 	antilag_rewind_players(self.responsetime, self);
 
 	org = self.origin + '0 0 16';
@@ -679,7 +677,7 @@ void() W_FireLightning =
 
 	LightningDamage (self.origin, trace_endpos + v_forward*4, self, 30);
 
-	// Put all the player entities back to their actual (server) positions
+	// QCAntilag: Put all the player entities back to their actual (server) positions
 	antilag_restore_players();
 };
 
@@ -810,10 +808,8 @@ void() W_FireSuperSpikes =
 	setmodel (newmis, "progs/s_spike.mdl");
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
 	self.punchangle_x = -2;
-	
-	
-	
-	// antilag
+
+	// QCAntilag: Set up missile antilag properties
 	if (self.flags & FL_CLIENT)
 	{
 		// use custom a movement .think
@@ -864,10 +860,8 @@ void(float ox) W_FireSpikes =
 	launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
 
 	self.punchangle_x = -2;
-	
-	
-	
-	// antilag
+
+	// QCAntilag: Set up missile antilag properties
 	if (self.flags & FL_CLIENT)
 	{
 		// use custom a movement .think
