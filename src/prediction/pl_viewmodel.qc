@@ -52,7 +52,6 @@ void V_ViewmodelPredraw()
 	v_viewmodel.origin = 0;
 	v_viewmodel.origin_x += v_bob * 0.4;
 	
-	
 	float oldframe = v_viewmodel.frame;
 	float oldmodel = v_viewmodel.modelindex;
 	
@@ -71,6 +70,9 @@ void V_ViewmodelPredraw()
 	}
 	
 	v_viewmodel.lerpfrac = max(0, v_viewmodel.lerpfrac - frametime * 10);
+	
+	if (getstati(STAT_ITEMS) & IT_INVISIBILITY)
+		v_viewmodel.modelindex = 0;
 }
 
 

@@ -28,6 +28,11 @@ float 	FL_NO_PLAYERS    		= 16384;
 float 	FL_NO_MONSTERS    		= 32768;
 float 	FL_NO_BOTS	    		= 65536;
 
+float	IT_INVISIBILITY			= 524288;
+float	IT_INVULNERABILITY		= 1048576;
+float	IT_SUIT					= 2097152;
+float	IT_QUAD					= 4194304;
+
 const float MASK_CUSTOMVIEWMODEL = 4;
 
 float show_score;
