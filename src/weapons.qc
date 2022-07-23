@@ -226,10 +226,7 @@ void(float damage, vector dir) TraceAttack =
 
 /*
 ================
-FireBullets
-
-Used by shotgun, super shotgun, and enemy soldier firing
-Go to the trouble of combining multiple pellets into a single damage call.
+Antilag
 ================
 */
 void (entity e, float rewindtime) antilag_rewind =
@@ -239,7 +236,22 @@ void (entity e, float rewindtime) antilag_rewind =
 	float i;
 	for(i = 0; i < ANTILAG_STATES; i++)
 	{
-		if (e.lastorigintime[i] < rewindtime)
+		// if we encounter a cleared value
+		if (lastorigintime[i] == 0)
+		{
+			// if this is the first array entry, the entire thing is cleared
+			if (i == 0) {
+				// return without messing with origin
+				return;
+			}
+			// use the previous one
+			else if (i > 0) {
+				rewindorigin = e.lastorigin[i - 1];
+				break;
+			}
+		}
+		// if we've gone over our target rewind time, use this origin
+		else if (rewindtime > e.lastorigintime[i])
 		{
 			rewindorigin = e.lastorigin[i];
 			break;
@@ -291,6 +303,14 @@ void () antilag_restore_players =
 	}
 }
 
+/*
+================
+FireBullets
+
+Used by shotgun, super shotgun, and enemy soldier firing
+Go to the trouble of combining multiple pellets into a single damage call.
+================
+*/
 void(float shotcount, vector dir, vector spread) FireBullets =
 {
 	local	vector direction;

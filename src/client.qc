@@ -488,6 +488,16 @@ called each time a player is spawned
 void() DecodeLevelParms;
 void() PlayerDie;
 
+//clear player positions
+void () ClearLastOrigin =
+{
+	float i;
+	for(i = 0; i < ANTILAG_STATES; i++)
+	{
+		self.lastorigin[i] = 0;
+		self.lastorigintime[i] = 0;
+	}
+};
 
 void() PutClientInServer =
 {
@@ -533,6 +543,9 @@ void() PutClientInServer =
 	self.origin = spot.origin + '0 0 1';
 	self.angles = spot.angles;
 	self.fixangle = TRUE;		// turn this way immediately
+
+// clear antilag rewind positions so we don't rewind players back to their dead positions after respawn
+	ClearLastOrigin();
 
 // oh, this is a hack!
 	setmodel (self, "progs/eyes.mdl");
