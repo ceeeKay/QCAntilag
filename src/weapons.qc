@@ -29,6 +29,150 @@ float() crandom =
 	return 2*(random() - 0.5);
 };
 
+// QCAntilag: Rewind an entity "e" to "rewindtime" to check for lag-compensated hits
+void (entity e, float rewindtime) antilag_rewind =
+{
+	vector rewindorigin;
+
+	float i;
+	for(i = 0; i < ANTILAG_STATES; i++)
+	{
+		// if we encounter a cleared value
+		if (lastorigintime[i] == 0)
+		{
+			// if this is the first array entry, the entire thing is cleared
+			if (i == 0) {
+				// return without messing with origin
+				return;
+			}
+			// use the previous one
+			else if (i > 0) {
+				rewindorigin = e.lastorigin[i - 1];
+				break;
+			}
+		}
+		// if we've gone over our target rewind time, use this origin
+		else if (rewindtime > e.lastorigintime[i])
+		{
+			rewindorigin = e.lastorigin[i];
+			break;
+		}
+	}
+
+	setorigin(e, rewindorigin);
+}
+
+// QCAntilag: Rewind all players to "pingtime" except for player "ignore"
+void (float pingtime, entity ignore) antilag_rewind_players =
+{
+	local entity player;
+
+	float timestamp_we_want = ((time * 1000) - pingtime);
+
+	player = find(world, classname, "player");
+
+	while (player)
+	{
+		if (player.deadflag == DEAD_NO)
+		{
+			// Store the player's .origin off to a temporary .hold_origin
+			player.hold_origin = player.origin;
+			// Don't rewind self
+			if (player != ignore)
+			{
+				// Rewind the player entity back to timestamp_we_want
+				antilag_rewind(player, timestamp_we_want);
+			}
+		}
+		player = find(player, classname, "player");
+	}
+}
+
+// QCAntilag: Restore all players' .origin back to where the server thinks they are
+void () antilag_restore_players =
+{
+	local entity player;
+
+	player = find(world, classname, "player");
+
+	while (player)
+	{
+		if (player.deadflag == DEAD_NO)
+		{
+			// Put everybody back where the server thinks they belong
+			setorigin(player, player.hold_origin);
+		}
+		player = find(player, classname, "player");
+	}
+}
+
+// QCAntilag: Extrapolate the visual antilagged position of projectiles to send to clients
+void Extrapolate_AntilagProjectile(entity missile)
+{
+	// Original physics position should have been stored in missile.hold_origin already
+
+	// Make sure to multiply by 0.001 to convert into seconds for desired velocity
+	traceline(missile.origin, missile.origin + (missile.velocity * missile.responsetime * 0.001), FALSE, missile);
+	// Move to the extrapolated position for good visuals
+	setorigin(missile, trace_endpos);
+}
+
+// QCAntilag: .think function for antilag projectiles (i.e. rockets, nails/spikes)
+void ThinkMovetype_AntilagProjectile()
+{
+	self.think = ThinkMovetype_AntilagProjectile;
+	self.nextthink = time + 0.01;
+	
+	setorigin(self, self.hold_origin);
+	
+	// If our SSQC is running at hyper fast framerate for some reason (FTE)
+	local float delta = frametime;
+	if (is_running_fte)
+	{
+		if (cvar("sv_gameplayfix_multiplethinks") || delta < 0.01)
+			delta = 0.01;
+	}
+	
+	// Use the client's response time to temporarily move all other player entities back in time
+	antilag_rewind_players(self.responsetime, self.owner);
+
+	// Trace a line from current position to the place where we'll be after the next frame
+	traceline(self.origin, self.origin + (self.velocity * delta), FALSE, self);
+
+	// Actually move the missile
+	setorigin(self, trace_endpos);
+
+	// If we run into something
+	if (trace_fraction < 1)
+	{
+		// Call T_MissileTouch()
+		if (self.touch)
+		{
+			other = trace_ent;
+			self.touch();
+		}
+
+		// Call the other entity's .touch function (if it has one)
+		if (trace_ent && trace_ent.touch)
+		{
+			entity oself = self;
+			other = self;
+			self = trace_ent;
+			self.touch();
+			self = oself;
+		}
+	}
+
+	// Put all the player entities back to their actual (server) positions
+	antilag_restore_players();
+	
+	// Track our true position
+	self.hold_origin = self.origin;
+	
+	// Run extrapolation
+	Extrapolate_AntilagProjectile(self);
+}
+
 /*
 ================
 W_FireAxe
@@ -41,6 +185,10 @@ void() W_FireAxe =
 
 	makevectors (self.v_angle);
 	source = self.origin + '0 0 16';
+
+	// QCAntilag: Use the client's response time to temporarily move all other player entities back in time
+	antilag_rewind_players(self.responsetime, self);
+
 	traceline (source, source + v_forward*64, FALSE, self);
 	if (trace_fraction == 1.0)
 		return;
@@ -62,6 +210,9 @@ void() W_FireAxe =
 		WriteCoord (MSG_BROADCAST, org_y);
 		WriteCoord (MSG_BROADCAST, org_z);
 	}
+
+	// QCAntilag: Put all the player entities back to their actual (server) positions
+	antilag_restore_players();
 };
 
 
@@ -224,83 +375,6 @@ void(float damage, vector dir) TraceAttack =
 	}
 };
 
-// QCAntilag: Rewind an entity "e" to "rewindtime" to check for lag-compensated hits
-void (entity e, float rewindtime) antilag_rewind =
-{
-	vector rewindorigin;
-
-	float i;
-	for(i = 0; i < ANTILAG_STATES; i++)
-	{
-		// if we encounter a cleared value
-		if (lastorigintime[i] == 0)
-		{
-			// if this is the first array entry, the entire thing is cleared
-			if (i == 0) {
-				// return without messing with origin
-				return;
-			}
-			// use the previous one
-			else if (i > 0) {
-				rewindorigin = e.lastorigin[i - 1];
-				break;
-			}
-		}
-		// if we've gone over our target rewind time, use this origin
-		else if (rewindtime > e.lastorigintime[i])
-		{
-			rewindorigin = e.lastorigin[i];
-			break;
-		}
-	}
-
-  	setorigin(e, rewindorigin);
-}
-
-// QCAntilag: Rewind all players to "pingtime" except for player "ignore"
-void (float pingtime, entity ignore) antilag_rewind_players =
-{
-	local entity player;
-
-	float timestamp_we_want = ((time * 1000) - pingtime);
-
-	player = find(world, classname, "player");
-
-	while (player)
-	{
-		if (player.deadflag == DEAD_NO)
-		{
-			// Store the player's .origin off to a temporary .hold_origin
-			player.hold_origin = player.origin;
-			// Don't rewind self
-			if (player != ignore)
-			{
-				// Rewind the player entity back to timestamp_we_want
-				antilag_rewind(player, timestamp_we_want);
-			}
-		}
-		player = find(player, classname, "player");
-	}
-}
-
-// QCAntilag: Restore all players' .origin back to where the server thinks they are
-void () antilag_restore_players =
-{
-	local entity player;
-
-	player = find(world, classname, "player");
-
-	while (player)
-	{
-		if (player.deadflag == DEAD_NO)
-		{
-			// Put everybody back where the server thinks they belong
-			setorigin(player, player.hold_origin);
-		}
-		player = find(player, classname, "player");
-	}
-}
-
 /*
 ================
 FireBullets
@@ -445,73 +519,6 @@ void() T_MissileTouch =
 
 	BecomeExplosion ();
 };
-
-// QCAntilag: Extrapolate the visual antilagged position of projectiles to send to clients
-void Extrapolate_AntilagProjectile(entity missile)
-{
-	// Original physics position should have been stored in missile.hold_origin already
-
-	// Make sure to multiply by 0.001 to convert into seconds for desired velocity
-	traceline(missile.origin, missile.origin + (missile.velocity * missile.responsetime * 0.001), FALSE, missile);
-	// Move to the extrapolated position for good visuals
-	setorigin(missile, trace_endpos);
-}
-
-// QCAntilag: .think function for antilag projectiles (i.e. rockets, nails/spikes)
-void ThinkMovetype_AntilagProjectile()
-{
-	self.think = ThinkMovetype_AntilagProjectile;
-	self.nextthink = time + 0.01;
-	
-	setorigin(self, self.hold_origin);
-	
-	// If our SSQC is running at hyper fast framerate for some reason (FTE)
-	local float delta = frametime;
-	if (is_running_fte)
-	{
-		if (cvar("sv_gameplayfix_multiplethinks") || delta < 0.01)
-			delta = 0.01;
-	}
-	
-	// Use the client's response time to temporarily move all other player entities back in time
-	antilag_rewind_players(self.responsetime, self.owner);
-
-	// Trace a line from current position to the place where we'll be after the next frame
-	traceline(self.origin, self.origin + (self.velocity * delta), FALSE, self);
-
-	// Actually move the missile
-	setorigin(self, trace_endpos);
-
-	// If we run into something
-	if (trace_fraction < 1)
-	{
-		// Call T_MissileTouch()
-		if (self.touch)
-		{
-			other = trace_ent;
-			self.touch();
-		}
-
-		// Call the other entity's .touch function (if it has one)
-		if (trace_ent && trace_ent.touch)
-		{
-			entity oself = self;
-			other = self;
-			self = trace_ent;
-			self.touch();
-			self = oself;
-		}
-	}
-
-	// Put all the player entities back to their actual (server) positions
-	antilag_restore_players();
-	
-	// Track our true position
-	self.hold_origin = self.origin;
-	
-	// Run extrapolation
-	Extrapolate_AntilagProjectile(self);
-}
 
 /*
 ================
