@@ -383,64 +383,6 @@ Used by shotgun, super shotgun, and enemy soldier firing
 Go to the trouble of combining multiple pellets into a single damage call.
 ================
 */
-void (entity e, float rewindtime) antilag_rewind =
-{
-	vector rewindorigin;
-
-	float i;
-	for(i = 0; i < ANTILAG_STATES; i++)
-	{
-		if (e.lastorigintime[i] < rewindtime)
-		{
-			rewindorigin = e.lastorigin[i];
-			break;
-		}
-	}
-
-  	setorigin(e, rewindorigin);
-}
-
-void (float pingtime, entity ignore) antilag_rewind_players =
-{
-	local entity player;
-
-	float timestamp_we_want = ((time * 1000) - pingtime);
-
-	player = find(world, classname, "player");
-
-	while (player)
-	{
-		if (player.deadflag == DEAD_NO)
-		{
-			// Store the player's .origin off to a temporary .hold_origin
-			player.hold_origin = player.origin;
-			// Don't rewind self
-			if (player != ignore)
-			{
-				// Rewind the player entity back to timestamp_we_want
-				antilag_rewind(player, timestamp_we_want);
-			}
-		}
-		player = find(player, classname, "player");
-	}
-}
-
-void () antilag_restore_players =
-{
-	local entity player;
-
-	player = find(world, classname, "player");
-
-	while (player)
-	{
-		if (player.deadflag == DEAD_NO)
-		{
-			// Put everybody back where the server thinks they belong
-			setorigin(player, player.hold_origin);
-		}
-		player = find(player, classname, "player");
-	}
-}
 
 void(float shotcount, vector dir, vector spread) FireBullets =
 {
