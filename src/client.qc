@@ -1258,9 +1258,15 @@ Called every frame after physics are run
 void() PlayerPostThink =
 {
 	if (self.impulse == 37)
+	{
 		client_responsetime_show();
+		self.impulse = 0;
+	}
 	else if (self.impulse == 38)
+	{
 		client_responsetime_set();
+		self.impulse = 0; // make sure we clear impulse, because it won't happen if we're reloading. Silly id1 code.
+	}
 	
 	// incase client is running at very high fps, keep this reined in.
 	if (time > self.antilag_updatetime)
