@@ -1327,6 +1327,14 @@ called when a player connects to a server
 */
 void() ClientConnect =
 {
+	// QCAntilag: tell ourselves which server we're in
+	if (is_running_fte) // if we're on FTE, we can use the QW way
+	{
+		sprint (self, "QCAntilag in FTE server mode\n");
+	} else {
+		sprint (self, "QCAntilag in QE server mode\n");
+	}
+
 	bprint (self.netname);
 	bprint (" entered the game\n");
 
