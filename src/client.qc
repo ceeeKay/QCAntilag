@@ -1139,7 +1139,7 @@ void () client_ping_think =
 		client.responsetime3 = client.responsetime2;
 		client.responsetime2 = client.responsetime1;
 
-		if (client.finaldest_y > self.finaldest_x && (client.finaldest_y - self.finaldest_x) < 400) // if we got a packed back, and it's not insanely high
+		if (client.finaldest_y > self.finaldest_x) // if we got a packet back
 		{
 			client.responsetime1 = (floor(client.finaldest_y - self.finaldest_x) - 16);
 			
@@ -1147,8 +1147,13 @@ void () client_ping_think =
 			client.responsetime1 = client.responsetime1 < 0 ? 0 : client.responsetime1;
 			client.responsetime1 = client.responsetime1 > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : client.responsetime1;
 		}
-		else
-			client.responsetime1 = client.responsetime;
+		else // packet dropped, lets make something up
+		{
+			if (self.finaldest_z > client.finaldest_y) // client hasn't responded in a long time, probably cl_filterstuffcmd 1
+				client.responsetime1 = 55;
+			else
+				client.responsetime1 = client.responsetime;
+		}
 
 		if (client.responsetime2 > 0)
 		{
@@ -1200,6 +1205,7 @@ void () client_responsetime_get_all =
     ping.nextthink = time + 2;
     ping.think = client_ping_think;
     ping.finaldest_x = (time * 1000);
+	ping.finaldest_z = ((time - 20) * 1000);
 	
 	responsetimecheck = (time + 10);
 };
@@ -1274,9 +1280,15 @@ void() PlayerPostThink =
 {
 	// QCAntilag: handle ping request and response impulses
 	if (self.impulse == 37)
+	{
 		client_responsetime_show();
+		self.impulse = 0;
+	}
 	else if (self.impulse == 38)
+	{
 		client_responsetime_set();
+		self.impulse = 0; // make sure we clear impulse, because it won't happen if we're reloading. Silly id1 code.
+	}
 	
 	// QCAntilag: in case client is running at very high fps, keep this reined in.
 	if (time > self.antilag_updatetime)
