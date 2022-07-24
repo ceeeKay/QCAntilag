@@ -383,7 +383,6 @@ Used by shotgun, super shotgun, and enemy soldier firing
 Go to the trouble of combining multiple pellets into a single damage call.
 ================
 */
-
 void(float shotcount, vector dir, vector spread) FireBullets =
 {
 	local	vector direction;
@@ -520,7 +519,6 @@ void() T_MissileTouch =
 
 	BecomeExplosion ();
 };
-
 
 /*
 ================
