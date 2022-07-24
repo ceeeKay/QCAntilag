@@ -1,6 +1,6 @@
 
 void() InitBodyQue;
-void client_responsetime_get_all();
+void client_responsetime_get_all(); // QCAntilag: forward declaration
 
 
 void() main =
@@ -183,7 +183,7 @@ void() worldspawn =
 	else
 		cvar_set ("sv_gravity", "800");
 
-	
+	// QCAntilag: Check for FTE server properties
 	if (cvar("pr_checkextension"))
 		is_running_fte = checkextension("FTE_MULTIPROGS");
 	
@@ -348,19 +348,18 @@ void() worldspawn =
 	lightstyle(63, "a");
 };
 
-
 void() StartFrame =
 {
 	teamplay = cvar("teamplay");
 	skill = cvar("skill");
 	framecount = framecount + 1;
 	
+	// QCAntilag: Periodically get clients' ping (response) times
 	if (time > responsetimecheck)
 	{
 		client_responsetime_get_all();
 	}
 };
-
 
 /*
 ==============================================================================

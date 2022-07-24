@@ -759,16 +759,15 @@ float (entity e, float healamount, float ignore) T_Heal; // health function
 
 float(entity targ, entity inflictor) CanDamage;
 
-
+// QCAntilag: global defines/constants
 #define ANTILAG_STATES				0x10
 #define ANTILAG_MASK				0x0F
-
 #define	ANTILAG_MAX_RESPONSETIME	150
 
+// QCAntilag: entity properties
 .vector lastorigin[ANTILAG_STATES];
 .float	lastorigintime[ANTILAG_STATES];
 .float	antilag_updatetime;
-
 .vector hold_origin;
 .float responsetime;
 .float responsetime1;
@@ -776,11 +775,11 @@ float(entity targ, entity inflictor) CanDamage;
 .float responsetime3;
 .float spamtime;
 
- // this stuff is only valid in FTE or another QW compatible engine
+// QCAntilag: this stuff is only valid in FTE or another QW compatible engine
 .void() customphysics;
 float(entity e, string key) infokeyf = #0:infokeyf;
 //
 
+// QCAntilag: globals
 float is_running_fte;
 float responsetimecheck;
-float SVC_STUFFTEXT = 9;

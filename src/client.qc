@@ -488,6 +488,16 @@ called each time a player is spawned
 void() DecodeLevelParms;
 void() PlayerDie;
 
+// QCAntilag: clear player positions
+void () ClearLastOrigin =
+{
+	float i;
+	for(i = 0; i < ANTILAG_STATES; i++)
+	{
+		self.lastorigin[i] = 0;
+		self.lastorigintime[i] = 0;
+	}
+};
 
 void() PutClientInServer =
 {
@@ -511,7 +521,6 @@ void() PutClientInServer =
 	self.invincible_finished = 0;
 	self.effects = 0;
 	self.invincible_time = 0;
-
     // Set players all on the same team so bots don't target you
     if(coop)
         self.team = 1;
@@ -533,6 +542,9 @@ void() PutClientInServer =
 	self.origin = spot.origin + '0 0 1';
 	self.angles = spot.angles;
 	self.fixangle = TRUE;		// turn this way immediately
+
+// clear antilag rewind positions so we don't rewind players back to their dead positions after respawn
+	ClearLastOrigin();
 
 // oh, this is a hack!
 	setmodel (self, "progs/eyes.mdl");
@@ -1116,6 +1128,7 @@ void() CheckPowerups =
 
 };
 
+// QCAntilag: Think function for client ping impulse
 void () client_ping_think =
 {
     local entity client;
@@ -1163,6 +1176,7 @@ void () client_ping_think =
     remove(self);
 };
 
+// QCAntilag: Request ping (response) time for all clients
 void () client_responsetime_get_all =
 {
 	if (is_running_fte) // if we're on FTE, we can use the QW way
@@ -1196,12 +1210,13 @@ void () client_responsetime_get_all =
 	responsetimecheck = (time + 10);
 };
 
+// QCAntilag: Store the ping (response) time for a ping entity
 void () client_responsetime_set =
 {
     self.finaldest_y = (time * 1000);
 };
 
-//debug function to see response times and frames
+// QCAntilag: Debug function to see response times and frames
 void () client_responsetime_show =
 {
 	//don't let players spam this
@@ -1239,7 +1254,7 @@ void () client_responsetime_show =
 	}
 };
 
-//rotate player positions
+// QCAntilag: Rotate player positions
 void () UpdateLastOrigin =
 {
 	// push array towards the end, this could be replaced with a circular buffer
@@ -1263,6 +1278,7 @@ Called every frame after physics are run
 */
 void() PlayerPostThink =
 {
+	// QCAntilag: handle ping request and response impulses
 	if (self.impulse == 37)
 	{
 		client_responsetime_show();
@@ -1274,7 +1290,7 @@ void() PlayerPostThink =
 		self.impulse = 0; // make sure we clear impulse, because it won't happen if we're reloading. Silly id1 code.
 	}
 	
-	// incase client is running at very high fps, keep this reined in.
+	// QCAntilag: in case client is running at very high fps, keep this reined in.
 	if (time > self.antilag_updatetime)
 	{
 		UpdateLastOrigin();
@@ -1323,6 +1339,14 @@ called when a player connects to a server
 */
 void() ClientConnect =
 {
+	// QCAntilag: tell ourselves which server we're in
+	if (is_running_fte) // if we're on FTE, we can use the QW way
+	{
+		sprint (self, "QCAntilag in FTE server mode\n");
+	} else {
+		sprint (self, "QCAntilag in QE server mode\n");
+	}
+
 	bprint (self.netname);
 	bprint (" entered the game\n");
 
