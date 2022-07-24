@@ -1183,7 +1183,7 @@ void() CheckPowerups =
 void () client_ping_think =
 {
     local entity client;
-	
+
     client = find(world, classname, "player");
     while (client)
     {
