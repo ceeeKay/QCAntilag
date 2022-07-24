@@ -24,4 +24,4 @@ See COPYING.txt for more details.
   for original QC hitscan implementation
 * Reki (https://github.com/Iceman12k/qeantilag)
   for all the inspiration, expertise, suggestions, and help
-* The great community at quakeqe.com for encouragement and playtesting!
+* The great community at https://quakeqe.com/ for encouragement and playtesting!
