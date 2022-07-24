@@ -1119,7 +1119,7 @@ void() CheckPowerups =
 void () client_ping_think =
 {
     local entity client;
-
+	
     client = find(world, classname, "player");
     while (client)
     {
@@ -1134,8 +1134,13 @@ void () client_ping_think =
 			client.responsetime1 = client.responsetime1 < 0 ? 0 : client.responsetime1;
 			client.responsetime1 = client.responsetime1 > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : client.responsetime1;
 		}
-		else
-			client.responsetime1 = client.responsetime;
+		else // packet dropped, lets make something up
+		{
+			if (self.finaldest_z > client.finaldest_y) // client hasn't responded in a long time, probably cl_filterstuffcmd 1
+				client.responsetime1 = 55;
+			else
+				client.responsetime1 = client.responsetime;
+		}
 
 		if (client.responsetime2 > 0)
 		{
@@ -1186,6 +1191,7 @@ void () client_responsetime_get_all =
     ping.nextthink = time + 2;
     ping.think = client_ping_think;
     ping.finaldest_x = (time * 1000);
+	ping.finaldest_z = ((time - 20) * 1000);
 	
 	responsetimecheck = (time + 10);
 };
