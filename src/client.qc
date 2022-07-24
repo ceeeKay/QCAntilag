@@ -1126,7 +1126,7 @@ void () client_ping_think =
 		client.responsetime3 = client.responsetime2;
 		client.responsetime2 = client.responsetime1;
 
-		if (client.finaldest_y > self.finaldest_x && (client.finaldest_y - self.finaldest_x) < 400) // if we got a packed back, and it's not insanely high
+		if (client.finaldest_y > self.finaldest_x) // if we got a packet back
 		{
 			client.responsetime1 = (floor(client.finaldest_y - self.finaldest_x) - 16);
 			
