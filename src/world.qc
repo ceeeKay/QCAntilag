@@ -186,7 +186,6 @@ void() worldspawn =
 	// QCAntilag: Check for FTE server properties
 	if (cvar("pr_checkextension"))
 		is_running_fte = checkextension("FTE_MULTIPROGS");
-	
 	if (is_running_fte)
 		cvar_set ("sv_gameplayfix_multiplethinks", "0");
 
