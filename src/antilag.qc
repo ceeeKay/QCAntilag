@@ -18,10 +18,14 @@
 .float 	responsetime3;
 .float 	spamtime;
 
+// QCAntilag: PlayerEXFlags for FTE
+.float	playerexflags;
+
 // QCAntilag: this stuff is only valid in FTE or another QW compatible engine
 .void() customphysics;
 string(entity e, string key) infokey = #0:infokey;
 float(entity e, string key) infokeyf = #0:infokeyf;
+float(string s1, string sub, optional float startidx) strstrofs = #0:strstrofs;
 
 const float MSG_MULTICAST = 4;	/* The byte(s) will be written into the multicast buffer for more selective sending. Messages sent this way will never be split across packets, and using this for csqc-only messages will not break protocol translation. */
 const float MULTICAST_ALL = 0;	/* The multicast message is unreliably sent to all players. MULTICAST_ constants are valid arguments for the multicast builtin, which ignores the specified origin when given this constant. */
@@ -371,4 +375,28 @@ void ThinkMovetype_AntilagProjectile()
 
 	// Run extrapolation
 	Extrapolate_AntilagProjectile(self);
+}
+
+// QCAntilag: parse PlayerEXFlags in FTE
+string(float) argv = #0:argv;
+float(string) tokenize = #0:tokenize;
+void(entity e, string s) clientcommand = #0:clientcommand;
+float(string) stof = #0:stof;
+
+float argc;
+void(string fullcmd) SV_ParseClientCommand
+{
+	argc = tokenize(fullcmd);
+	string cmd = argv(0);
+	
+	if (cmd == "playerexflags")
+	{
+		self.playerexflags = stof(argv(1));
+		sprint(self, "PlayerEXFlags set to ");
+		sprint(self, ftos(self.playerexflags));
+		sprint(self, "\n");
+		return;
+	}
+	
+	clientcommand(self, fullcmd);
 }

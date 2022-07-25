@@ -1515,6 +1515,22 @@ void() ClientConnect =
 	if (is_running_fte) // if we're on FTE, we can use the QW way
 	{
 		sprint (self, "QCAntilag in FTE server mode\n");
+		string protocol = infokey(self, "protocol");
+		float is_qw_client = (strstrofs(protocol, "quakeworld") != -1);
+		
+		if (!self.playerexflags) 
+		{
+			if (infokey(self, "playerexflags") == "")
+			{
+				if (is_qw_client) // if we're QW and haven't gotten any exflags yet, assume never change
+					self.playerexflags |= PEF_CHANGENEVER;
+			}
+			else // if we have userinfo playerexflags, use those
+			{
+				self.playerexflags = infokeyf(self, "playerexflags");
+			}
+		}
+		
 	} else {
 		sprint (self, "QCAntilag in QE server mode\n");
 	}
