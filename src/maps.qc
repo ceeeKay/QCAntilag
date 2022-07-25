@@ -1,7 +1,6 @@
 #define ShowModName 1
 #define ModName "QCAntilag"
 
-
 #define FirstDefineMap(_bspname,_maptitle) if(mapname == ##_bspname && title == ##_maptitle) { return ##_maptitle" ("ModName")"; }
 #define DefineMap(_bspname,_maptitle) else FirstDefineMap(_bspname,_maptitle)
 #define OverrideDefineMap(_bspname,_maptitle) else if(mapname == ##_bspname) { return ##_maptitle" ("ModName")"; }
