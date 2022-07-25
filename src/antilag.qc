@@ -67,7 +67,7 @@ float(vector ang1, vector ang2) CompareNetAngles =
 	ang2[1] = floor(ang2[1]*(256/360) - 0.5) & 255;
 	ang1[2] = floor(ang1[2]*(256/360) - 0.5) & 255;
 	ang2[2] = floor(ang2[2]*(256/360) - 0.5) & 255;
-	
+
 	return (ang1 == ang2);
 };
 
@@ -103,7 +103,7 @@ void () client_ping_think =
 		{
 			self.antilag_flags &= ~ANTILAG_FL_SPAWNTEST;
 			client.responsetime1 = (floor(client.finaldest_y - self.finaldest_x) - 16);
-			
+
 			// cap to acceptable values
 			client.responsetime1 = client.responsetime1 < 0 ? 0 : client.responsetime1;
 			client.responsetime1 = client.responsetime1 > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : client.responsetime1;
@@ -148,12 +148,12 @@ void () client_responsetime_get_all =
 		for(entity pl = find(world, classname, "player"); pl; pl = find(pl, classname, "player"))
 		{
 			pl.responsetime = infokeyf(pl, "ping") - 8; // account for QW input frame timey-ness
-			
+
 			// cap to acceptable values
 			pl.responsetime = pl.responsetime < 0 ? 0 : pl.responsetime;
 			pl.responsetime = pl.responsetime > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : pl.responsetime;
 		}
-		
+
 		responsetimecheck = (time + 3); // we're using engine stuff, so we can speed this polling up a bit
 		return;
 	}
@@ -388,7 +388,7 @@ void(string fullcmd) SV_ParseClientCommand
 {
 	argc = tokenize(fullcmd);
 	string cmd = argv(0);
-	
+
 	if (cmd == "playerexflags")
 	{
 		self.playerexflags = stof(argv(1));
@@ -397,6 +397,6 @@ void(string fullcmd) SV_ParseClientCommand
 		sprint(self, "\n");
 		return;
 	}
-	
+
 	clientcommand(self, fullcmd);
 }
