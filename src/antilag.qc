@@ -2,21 +2,43 @@
 #define ANTILAG_STATES				0x10
 #define ANTILAG_MASK				0x0F
 #define	ANTILAG_MAX_RESPONSETIME	150
+#define ANTILAG_FL_SPAWNTEST		0x01
 
 // QCAntilag: entity properties
-.vector lastorigin[ANTILAG_STATES];
-.float	lastorigintime[ANTILAG_STATES];
-.float	antilag_updatetime;
+.float 	antilag_flags;
+.vector	lastorigin[ANTILAG_STATES];
+.float 	lastorigintime[ANTILAG_STATES];
+.float 	antilag_updatetime;
 .vector hold_origin;
-.float responsetime;
-.float responsetime1;
-.float responsetime2;
-.float responsetime3;
-.float spamtime;
+.vector	spawn_angles;
+.float 	spawn_time;
+.float 	responsetime;
+.float 	responsetime1;
+.float 	responsetime2;
+.float 	responsetime3;
+.float 	spamtime;
+
+// QCAntilag: PlayerEXFlags for FTE
+.float	playerexflags;
 
 // QCAntilag: this stuff is only valid in FTE or another QW compatible engine
 .void() customphysics;
+string(entity e, string key) infokey = #0:infokey;
 float(entity e, string key) infokeyf = #0:infokeyf;
+float(string s1, string sub, optional float startidx) strstrofs = #0:strstrofs;
+
+const float MSG_MULTICAST = 4;	/* The byte(s) will be written into the multicast buffer for more selective sending. Messages sent this way will never be split across packets, and using this for csqc-only messages will not break protocol translation. */
+const float MULTICAST_ALL = 0;	/* The multicast message is unreliably sent to all players. MULTICAST_ constants are valid arguments for the multicast builtin, which ignores the specified origin when given this constant. */
+const float MULTICAST_PHS = 1;	/* The multicast message is unreliably sent to only players that can potentially hear the specified origin. Its quite loose. */
+const float MULTICAST_PVS = 2;	/* The multicast message is unreliably sent to only players that can potentially see the specified origin. */
+const float MULTICAST_ONE = 6;	/* The multicast message is unreliably sent to the player (AND ALL TRACKING SPECTATORS) specified in the msg_entity global. The specified origin is ignored. */
+const float MULTICAST_ONE_NOSPECS = 9;	/* The multicast message is unreliably sent to the player specified in the msg_entity global. The specified origin is ignored. */
+const float MULTICAST_ALL_R = 3;	/* The multicast message is reliably sent to all players. The specified origin is ignored. */
+const float MULTICAST_PHS_R = 4;	/* The multicast message is reliably sent to only players that can potentially hear the specified origin. Players might still not receive it if they are out of range. */
+const float MULTICAST_PVS_R = 5;	/* The multicast message is reliably sent to only players that can potentially see the specified origin. Players might still not receive it if they cannot see the event. */
+const float MULTICAST_ONE_R = 7;	/* The multicast message is reliably sent to the player (AND ALL TRACKING SPECTATORS) specified in the msg_entity global. The specified origin is ignored */
+const float MULTICAST_ONE_R_NOSPECS = 10;	/* The multicast message is reliably sent to the player specified in the msg_entity global. The specified origin is ignored */
+float(vector where, float set) multicast = #0:multicast;
 //
 
 // QCAntilag: globals
@@ -34,6 +56,38 @@ void () ClearLastOrigin =
 	}
 };
 
+// QCAntilag: compare angles to see if they're within margin of error
+float(vector ang1, vector ang2) CompareNetAngles =
+{
+	// putting this in a loop inexplicably causes a crash... no idea
+	// the math here is just replicating WriteAngle behavior
+	ang1[0] = floor(ang1[0]*(256/360) - 0.5) & 255;
+	ang2[0] = floor(ang2[0]*(256/360) - 0.5) & 255;
+	ang1[1] = floor(ang1[1]*(256/360) - 0.5) & 255;
+	ang2[1] = floor(ang2[1]*(256/360) - 0.5) & 255;
+	ang1[2] = floor(ang1[2]*(256/360) - 0.5) & 255;
+	ang2[2] = floor(ang2[2]*(256/360) - 0.5) & 255;
+	
+	return (ang1 == ang2);
+};
+
+// QCAntilag: check angles for spawn
+void() CheckSpawnTest =
+{
+	if (self.antilag_flags & ANTILAG_FL_SPAWNTEST && self.spawn_time)
+	{
+		if (CompareNetAngles(self.v_angle, self.spawn_angles))
+		{
+			self.responsetime1 = (time - self.spawn_time) * 1000;
+			self.spawn_time = 0;
+		}
+		else if (time - self.spawn_time > 0.5) // timeout, something went wrong. not exactly unexpected with this hack
+		{
+			self.spawn_time = 0;
+		}
+	}
+}
+
 // QCAntilag: Think function for client ping impulse
 void () client_ping_think =
 {
@@ -47,8 +101,9 @@ void () client_ping_think =
 
 		if (client.finaldest_y > self.finaldest_x) // if we got a packet back
 		{
+			self.antilag_flags &= ~ANTILAG_FL_SPAWNTEST;
 			client.responsetime1 = (floor(client.finaldest_y - self.finaldest_x) - 16);
-
+			
 			// cap to acceptable values
 			client.responsetime1 = client.responsetime1 < 0 ? 0 : client.responsetime1;
 			client.responsetime1 = client.responsetime1 > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : client.responsetime1;
@@ -56,7 +111,10 @@ void () client_ping_think =
 		else // packet dropped, lets make something up
 		{
 			if (self.finaldest_z > client.finaldest_y) // client hasn't responded in a long time, probably cl_filterstuffcmd 1
-				client.responsetime1 = 55;
+			{
+				client.antilag_flags |= ANTILAG_FL_SPAWNTEST;
+				client.responsetime1 = client.responsetime;
+			}
 			else
 				client.responsetime1 = client.responsetime;
 		}
@@ -76,10 +134,10 @@ void () client_ping_think =
 		{
 			client.responsetime = client.responsetime1;
 		}
-		client = find(client, classname, "player");
-	}
+        client = find(client, classname, "player");
+    }
 
-	remove(self);
+    remove(self);
 };
 
 // QCAntilag: Request ping (response) time for all clients
@@ -90,12 +148,12 @@ void () client_responsetime_get_all =
 		for(entity pl = find(world, classname, "player"); pl; pl = find(pl, classname, "player"))
 		{
 			pl.responsetime = infokeyf(pl, "ping") - 8; // account for QW input frame timey-ness
-
+			
 			// cap to acceptable values
 			pl.responsetime = pl.responsetime < 0 ? 0 : pl.responsetime;
 			pl.responsetime = pl.responsetime > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : pl.responsetime;
 		}
-
+		
 		responsetimecheck = (time + 3); // we're using engine stuff, so we can speed this polling up a bit
 		return;
 	}
@@ -317,4 +375,28 @@ void ThinkMovetype_AntilagProjectile()
 
 	// Run extrapolation
 	Extrapolate_AntilagProjectile(self);
+}
+
+// QCAntilag: parse PlayerEXFlags in FTE
+string(float) argv = #0:argv;
+float(string) tokenize = #0:tokenize;
+void(entity e, string s) clientcommand = #0:clientcommand;
+float(string) stof = #0:stof;
+
+float argc;
+void(string fullcmd) SV_ParseClientCommand
+{
+	argc = tokenize(fullcmd);
+	string cmd = argv(0);
+	
+	if (cmd == "playerexflags")
+	{
+		self.playerexflags = stof(argv(1));
+		sprint(self, "PlayerEXFlags set to ");
+		sprint(self, ftos(self.playerexflags));
+		sprint(self, "\n");
+		return;
+	}
+	
+	clientcommand(self, fullcmd);
 }

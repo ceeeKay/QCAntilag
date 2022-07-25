@@ -947,11 +947,9 @@ float() W_BestWeapon =
 
 float(entity playerEnt, float old, float new) W_WantsToChangeWeapon =
 {
-	float playerFlags;
-	if (!(is_running_fte))
-	{
-		CheckPlayerEXFlags(playerEnt);
-	}
+	float playerFlags = self.playerexflags;
+	if !(is_running_fte)
+		playerFlags = CheckPlayerEXFlags(playerEnt);
 
 	if((playerFlags & PEF_CHANGENEVER) != 0)
 	{

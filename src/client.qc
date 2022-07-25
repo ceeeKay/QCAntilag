@@ -784,8 +784,26 @@ void() PutClientInServer =
 	self.origin = spot.origin + '0 0 1';
 	self.angles = spot.angles;
 	self.fixangle = TRUE;		// turn this way immediately
+	
+// QCAntilag: Track spawn angles and time so we can determine ping time from fixangle if needed
+	if (self.antilag_flags & ANTILAG_FL_SPAWNTEST) // send the angles manually if we're using spawntest ping check
+	{
+		self.fixangle = FALSE;
+		self.spawn_angles = self.angles;
+		self.spawn_time = time;
+		
+		msg_entity = self;
+		
+		WriteByte(MSG_ONE, SVC_SETANGLE);
+		WriteAngle(MSG_ONE, self.angles[0]);
+		WriteAngle(MSG_ONE, self.angles[1]);
+		WriteAngle(MSG_ONE, self.angles[2]);
+	}
 
-	// oh, this is a hack!
+// QCAntilag: clear antilag rewind positions so we don't rewind players back to their dead positions after respawn
+	ClearLastOrigin();
+
+// oh, this is a hack!
 	setmodel (self, "progs/eyes.mdl");
 	modelindex_eyes = self.modelindex;
 
@@ -1198,6 +1216,10 @@ void() PlayerPreThink =
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
+	
+	// QCAntilag: spawntest for cl_filterstuffcmd clients
+	CheckSpawnTest();
+	
 
 	makevectors (self.v_angle);		// is this still used
 
@@ -1493,6 +1515,22 @@ void() ClientConnect =
 	if (is_running_fte) // if we're on FTE, we can use the QW way
 	{
 		sprint (self, "QCAntilag in FTE server mode\n");
+		string protocol = infokey(self, "protocol");
+		float is_qw_client = (strstrofs(protocol, "quakeworld") != -1);
+		
+		if (!self.playerexflags) 
+		{
+			if (infokey(self, "playerexflags") == "")
+			{
+				if (is_qw_client) // if we're QW and haven't gotten any exflags yet, assume never change
+					self.playerexflags |= PEF_CHANGENEVER;
+			}
+			else // if we have userinfo playerexflags, use those
+			{
+				self.playerexflags = infokeyf(self, "playerexflags");
+			}
+		}
+		
 	} else {
 		sprint (self, "QCAntilag in QE server mode\n");
 	}
