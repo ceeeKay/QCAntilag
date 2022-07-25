@@ -819,11 +819,12 @@ void() PutClientInServer =
 	self.fixangle = TRUE;		// turn this way immediately
 	
 // QCAntilag: Track spawn angles and time so we can determine ping time from fixangle if needed
-	self.spawn_angles = self.angles;
-	self.spawn_time = time;
 	if (self.antilag_flags & ANTILAG_FL_SPAWNTEST) // send the angles manually if we're using spawntest ping check
 	{
 		self.fixangle = FALSE;
+		self.spawn_angles = self.angles;
+		self.spawn_time = time;
+		
 		msg_entity = self;
 		
 		WriteByte(MSG_ONE, SVC_SETANGLE);
