@@ -950,7 +950,7 @@ float(entity playerEnt, float old, float new) W_WantsToChangeWeapon =
 	float playerFlags;
 	if (!(is_running_fte))
 	{
-		CheckPlayerEXFlags(playerEnt);
+		playerFlags = CheckPlayerEXFlags(playerEnt);
 	}
 
 	if((playerFlags & PEF_CHANGENEVER) != 0)
