@@ -699,39 +699,6 @@ void() DecodeLevelParms;
 void() PlayerDie;
 
 
-// QCAntilag: compare angles to see if they're within margin of error
-float(vector ang1, vector ang2) CompareNetAngles =
-{
-	// putting this in a loop inexplicably causes a crash... no idea
-	// the math here is just replicating WriteAngle behavior
-	ang1[0] = floor(ang1[0]*(256/360) - 0.5) & 255;
-	ang2[0] = floor(ang2[0]*(256/360) - 0.5) & 255;
-	ang1[1] = floor(ang1[1]*(256/360) - 0.5) & 255;
-	ang2[1] = floor(ang2[1]*(256/360) - 0.5) & 255;
-	ang1[2] = floor(ang1[2]*(256/360) - 0.5) & 255;
-	ang2[2] = floor(ang2[2]*(256/360) - 0.5) & 255;
-	
-	return (ang1 == ang2);
-};
-
-// QCAntilag: check angles for spawn
-void() CheckSpawnTest =
-{
-	if (self.antilag_flags & ANTILAG_FL_SPAWNTEST && self.spawn_time)
-	{
-		if (CompareNetAngles(self.v_angle, self.spawn_angles))
-		{
-			self.responsetime1 = (time - self.spawn_time) * 1000;
-			self.spawn_time = 0;
-		}
-		else if (time - self.spawn_time > 0.5) // timeout, something went wrong. not exactly unexpected with this hack
-		{
-			self.spawn_time = 0;
-		}
-	}
-}
-
-
 void() PutClientInServer =
 {
 	local	entity spot;
