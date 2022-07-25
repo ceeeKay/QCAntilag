@@ -195,8 +195,8 @@ void() misc_fireball =
 	self.classname = "fireball";
 	self.nextthink = time + (random() * 5);
 	self.think = fire_fly;
-	self.netname = "$qc_lava_ball";
-	self.killstring = "$qc_ks_lavaball";
+	self.netname = "lavaball";
+	self.killstring = " ate a lavaball\n";
 
 	if (!self.speed)
 		self.speed = 1000;
@@ -221,8 +221,8 @@ void() fire_fly =
 	fireball.think = SUB_Remove;
 	fireball.touch = fire_touch;
 
-	self.netname = "$qc_lava_ball";
-	self.killstring = "$qc_ks_lavaball";
+	self.netname = "lavaball";
+	self.killstring = " ate a lavaball\n";
 	
 	self.nextthink = time + (random() * 5) + 3;
 	self.think = fire_fly;
@@ -277,8 +277,8 @@ void() misc_explobox =
 	self.health = 20;
 	self.th_die = barrel_detonate;
 	self.takedamage = DAMAGE_AIM;
-	self.netname = "$qc_exploding_barrel";
-	self.killstring = "$qc_ks_blew_up";
+	self.netname = "exploding barrel";
+	self.killstring = " blew up\n";
 
 	self.origin_z = self.origin_z + 2;
 	oldz = self.origin_z;
@@ -347,8 +347,8 @@ void() trap_spikeshooter =
 {
 	SetMovedir ();
 	self.use = spikeshooter_use;
-	self.netname = "$qc_spike_trap";
-	self.killstring ="$qc_ks_spiked";
+	self.netname = "spike trap";
+	self.killstring = " was spiked\n";
 
 	if (self.spawnflags & SPAWNFLAG_LASER)
 	{

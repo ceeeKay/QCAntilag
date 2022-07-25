@@ -410,8 +410,8 @@ void() monster_shambler =
 	setmodel (self, "progs/shambler.mdl");
 	
 	self.noise = "shambler/ssight.wav";
-	self.netname = "$qc_shambler";
-	self.killstring = "$qc_ks_shambler";
+	self.netname = "shambler";
+	self.killstring = " was smashed by a Shambler\n";
 
 
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);

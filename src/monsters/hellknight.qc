@@ -464,8 +464,8 @@ void() monster_hell_knight =
 	setmodel (self, "progs/hknight.mdl");
 
 	self.noise = "hknight/sight1.wav";
-	self.netname = "$qc_death_knight";
-	self.killstring = "$qc_ks_deathknight";
+	self.netname = "$death knight";
+	self.killstring = " was slain by a Death Knight\n";
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 250;

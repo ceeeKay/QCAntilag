@@ -256,8 +256,8 @@ void() monster_shalrath =
 	setmodel (self, "progs/shalrath.mdl");
 
 	self.noise = "shalrath/sight.wav";
-	self.netname = "$qc_vore";
-	self.killstring = "$qc_ks_vore";
+	self.netname = "vore";
+	self.killstring = " was exploded by a Vore\n";
 
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
 	self.health = 400;

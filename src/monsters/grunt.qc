@@ -313,8 +313,8 @@ void() monster_army =
 	setmodel (self, "progs/soldier.mdl");
 
 	self.noise = "soldier/sight1.wav";
-	self.netname = "$qc_grunt";
-	self.killstring = "$qc_ks_grunt";
+	self.netname = "grunt";
+	self.killstring = " was shot by a Grunt\n";
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 30;

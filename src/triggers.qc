@@ -230,7 +230,7 @@ void() trigger_secret =
 	self.wait = -1;
 
 	if (!self.message)
-		self.message = "$qc_found_secret";
+	self.message = "You found a secret area!";
 
 	if (!self.sounds)
 		self.sounds = 1;
@@ -264,20 +264,20 @@ void() counter_use =
 		if (activator.classname == "player" && (self.spawnflags & SPAWNFLAG_NOMESSAGE) == 0)
 		{
 			if (self.count >= 4)
-				centerprint (activator, "$qc_more_go");
+				centerprint (activator, "There are more to go...");
 			else if (self.count == 3)
-				centerprint (activator, "$qc_three_more");
+				centerprint (activator, "Only 3 more to go...");
 			else if (self.count == 2)
-				centerprint (activator, "$qc_two_more");
+				centerprint (activator, "Only 2 more to go...");
 			else
-				centerprint (activator, "$qc_one_more");
+				centerprint (activator, "Only 1 more to go...");
 		}
 
 		return;
 	}
 	
 	if (activator.classname == "player" && (self.spawnflags & SPAWNFLAG_NOMESSAGE) == 0)
-		centerprint(activator, "$qc_sequence_completed");
+		centerprint(activator, "Sequence completed!");
 
 	self.enemy = activator;
 	multi_trigger ();

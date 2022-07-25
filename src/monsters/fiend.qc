@@ -225,9 +225,9 @@ void() monster_demon1 =
 
 	setmodel (self, "progs/demon.mdl");
 	self.noise = "demon/sight2.wav";
-	self.killstring = "$qc_ks_fiend";
+	self.killstring = " was eviscerated by a Fiend\n";
 
-	self.netname = "$qc_fiend";
+	self.netname = "fiend";
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
 	self.health = 300;
 	self.max_health = 300;

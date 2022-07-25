@@ -198,9 +198,9 @@ void() monster_fish =
 
 	setmodel (self, "progs/fish.mdl");
 
-	self.netname = "$qc_rotfish";
+	self.netname = "rotfish";
 	self.noise = "fish/idle.wav";
-	self.killstring = "$qc_ks_rotfish";
+	self.killstring = " was fed to the Rotfish";
 
 	setsize (self, '-16 -16 -24', '16 16 24');
 	self.health = 25;

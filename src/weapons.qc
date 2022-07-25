@@ -1135,13 +1135,13 @@ void() W_ChangeWeapon =
 	
 	if (!(self.items & fl))
 	{	// don't have the weapon or the ammo
-		sprint (self, "$qc_no_weapon");
+		sprint (self, "no weapon.\n");
 		return;
 	}
 	
 	if (am)
 	{	// don't have the ammo
-		sprint (self, "$qc_not_enough_ammo");
+		sprint (self, "not enough ammo.\n");
 		return;
 	}
 

@@ -367,8 +367,8 @@ void() monster_dog =
 	setmodel (self, "progs/dog.mdl");
 
 	self.noise = "dog/dsight.wav";	
-	self.netname = "$qc_rottweiler";
-	self.killstring = "$qc_ks_rottweiler";
+	self.netname = "rottweiler";
+	self.killstring = " was mauled by a Rottweiler\n";
 
 	setsize (self, '-32 -32 -24', '32 32 40');
 	self.health = 25;

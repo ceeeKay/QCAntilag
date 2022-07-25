@@ -273,8 +273,8 @@ void() monster_knight =
 	setmodel (self, "progs/knight.mdl");
 
 	self.noise = "knight/ksight.wav";
-	self.netname = "$qc_knight";
-	self.killstring = "$qc_ks_knight";
+	self.netname = "$knight";
+	self.killstring = " was slashed by a Knight\n";
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 75;

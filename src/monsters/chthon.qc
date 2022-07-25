@@ -280,8 +280,8 @@ void() boss_awake =
 	
 	setmodel (self, "progs/boss.mdl");
 
-	self.netname = "$qc_chthon";
-	self.killstring = "$qc_ks_chthon";
+	self.netname = "Chthon";
+	self.killstring = " was shamefully killed by Chthon\n";
 
 	setsize (self, '-128 -128 -24', '128 128 256');
 	

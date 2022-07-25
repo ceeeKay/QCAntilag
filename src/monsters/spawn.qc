@@ -222,8 +222,8 @@ void() monster_tarbaby =
 	setmodel (self, "progs/tarbaby.mdl");
 
 	self.noise = "blob/sight1.wav";
-	self.netname = "$qc_spawn";
-	self.killstring = "$qc_ks_spawn";
+	self.netname = "spawn";
+	self.killstring = " was slimed by a Spawn";
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 80;

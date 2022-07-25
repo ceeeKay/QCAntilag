@@ -241,17 +241,17 @@ void() door_touch =
 		{
 			if (world.worldtype == WORLDTYPE_BASE)
 			{
-				centerprint (other, "$qc_need_silver_keycard");
+				centerprint (other, "You need the silver keycard");
 				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 			}
 			else if (world.worldtype == WORLDTYPE_METAL)
 			{
-				centerprint (other, "$qc_need_silver_runekey");
+				centerprint (other, "You need the silver runekey");
 				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 			}
 			else if (world.worldtype == WORLDTYPE_MEDIEVAL)
 			{
-				centerprint (other, "$qc_need_silver_key");
+				centerprint (other, "You need the silver key");
 				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 			}
 		}
@@ -259,17 +259,17 @@ void() door_touch =
 		{
 			if (world.worldtype == WORLDTYPE_BASE)
 			{
-				centerprint (other, "$qc_need_gold_keycard");
+				centerprint (other, "You need the gold keycard");
 				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 			}
 			else if (world.worldtype == WORLDTYPE_METAL)
 			{
-				centerprint (other, "$qc_need_gold_runekey");
+				centerprint (other, "You need the gold runekey");
 				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);			
 			}
 			else if (world.worldtype == WORLDTYPE_MEDIEVAL)
 			{
-				centerprint (other, "$qc_need_gold_key");
+				centerprint (other, "You need the gold key");
 				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 			}
 		}

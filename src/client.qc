@@ -206,12 +206,12 @@ void() ExitIntermission =
 			if (!cvar("registered"))
 			{
 				WriteByte (MSG_ALL, SVC_FINALE);
-				WriteString (MSG_ALL, "$qc_finale_e1_shareware");
+				WriteString (MSG_ALL, "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task in the other three\nhaunted lands of Quake. Or are you? If\nyou don't register Quake, you'll never\nknow what awaits you in the Realm of\nBlack Magic, the Netherworld, and the\nElder World!");
 			}
 			else
 			{
 				WriteByte (MSG_ALL, SVC_FINALE);
-				WriteString (MSG_ALL, "$qc_finale_e1");
+				WriteString (MSG_ALL, "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task. A Rune of magic\npower lies at the end of each haunted\nland of Quake. Go forth, seek the\ntotality of the four Runes!");
 			}
 	
 			return;
@@ -223,7 +223,7 @@ void() ExitIntermission =
 			WriteByte (MSG_ALL, 3);
 
 			WriteByte (MSG_ALL, SVC_FINALE);
-			WriteString (MSG_ALL, "$qc_finale_e2");
+			WriteString (MSG_ALL, "The Rune of Black Magic throbs evilly in\nyour hand and whispers dark thoughts\ninto your brain. You learn the inmost\nlore of the Hell-Mother; Shub-Niggurath!\nYou now know that she is behind all the\nterrible plotting which has led to so\nmuch death and horror. But she is not\ninviolate! Armed with this Rune, you\nrealize that once all four Runes are\ncombined, the gate to Shub-Niggurath's\nPit will open, and you can face the\nWitch-Goddess herself in her frightful\notherworld cathedral.");
 			return;
 		}
 		else if (world.model == "maps/e3m6.bsp")
@@ -233,7 +233,7 @@ void() ExitIntermission =
 			WriteByte (MSG_ALL, 3);
 
 			WriteByte (MSG_ALL, SVC_FINALE);
-			WriteString (MSG_ALL, "$qc_finale_e3");
+			WriteString (MSG_ALL, "The charred viscera of diabolic horrors\nbubble viscously as you seize the Rune\nof Hell Magic. Its heat scorches your\nhand, and its terrible secrets blight\nyour mind. Gathering the shreds of your\ncourage, you shake the devil's shackles\nfrom your soul, and become ever more\nhard and determined to destroy the\nhideous creatures whose mere existence\nthreatens the souls and psyches of all\nthe population of Earth.");
 			return;
 		}
 		else if (world.model == "maps/e4m7.bsp")
@@ -243,7 +243,7 @@ void() ExitIntermission =
 			WriteByte (MSG_ALL, 3);
 
 			WriteByte (MSG_ALL, SVC_FINALE);
-			WriteString (MSG_ALL, "$qc_finale_e4");
+			WriteString (MSG_ALL, "Despite the awful might of the Elder\nWorld, you have achieved the Rune of\nElder Magic, capstone of all types of\narcane wisdom. Beyond good and evil,\nbeyond life and death, the Rune\npulsates, heavy with import. Patient and\npotent, the Elder Being Shub-Niggurath\nweaves her dire plans to clear off all\nlife from the Earth, and bring her own\nfoul offspring to our world! For all the\ndwellers in these nightmare dimensions\nare her descendants! Once all Runes of\nmagic power are united, the energy\nbehind them will blast open the Gateway\nto Shub-Niggurath, and you can travel\nthere to foil the Hell-Mother's plots\nin person.");
 			return;
 		}
 
@@ -261,7 +261,7 @@ void() ExitIntermission =
 		if ( (serverflags&15) == 15)
 		{
 			WriteByte (MSG_ALL, SVC_FINALE);
-			WriteString (MSG_ALL, "$qc_finale_all_runes");
+			WriteString (MSG_ALL, "Now, you have all four Runes. You sense\ntremendous invisible forces moving to\nunseal ancient barriers. Shub-Niggurath\nhad hoped to use the Runes Herself to\nclear off the Earth, but now instead,\nyou will use them to enter her home and\nconfront her as an avatar of avenging\nEarth-life. If you defeat her, you will\nbe remembered forever as the savior of\nthe planet. If she conquers, it will be\nas if you had never been born.");
 			return;
 		}
 		
@@ -402,7 +402,8 @@ void() changelevel_touch =
 
 	if (coop || deathmatch)
 	{
-		bprint("$qc_exited", other.netname);
+		bprint (other.netname);
+		bprint (" exited the level\n");
 
 	}
 	
@@ -435,7 +436,7 @@ void() trigger_changelevel =
 		objerror ("changelevel trigger doesn't have map");
 
 	self.netname = "changelevel";
-	self.killstring = "$qc_ks_tried_leave";
+	self.killstring = " tried to leave\n";
 	
 	InitTrigger ();
 	self.touch = changelevel_touch;
@@ -500,7 +501,8 @@ Player entered the suicide command
 */
 void() ClientKill =
 {
-	bprint("$qc_suicides", self.netname);
+	bprint (self.netname);
+	bprint (" suicides\n");
 	set_suicide_frame ();
 	self.modelindex = modelindex_player;
 	self.frags = self.frags - 2;	// extra penalty
@@ -1261,7 +1263,7 @@ void() CheckPowerups =
 		{
 			if (self.invisible_time == 1)
 			{
-				sprint(self, "$qc_ring_fade");
+				sprint (self, "Ring of Shadows magic is fading\n");
 				stuffcmd (self, "bf\n");
 				sound (self, CHAN_AUTO, "items/inv2.wav", 1, ATTN_NORM);
 				self.invisible_time = time + 1;
@@ -1296,7 +1298,7 @@ void() CheckPowerups =
 		{
 			if (self.invincible_time == 1)
 			{
-				sprint(self, "$qc_protection_fade");
+				sprint (self, "Protection is almost burned out\n");
 				stuffcmd (self, "bf\n");
 				sound (self, CHAN_AUTO, "items/protect2.wav", 1, ATTN_NORM);
 				self.invincible_time = time + 1;
@@ -1330,7 +1332,7 @@ void() CheckPowerups =
 		{
 			if (self.super_time == 1)
 			{
-				sprint(self, "$qc_quad_fade");
+				sprint (self, "Quad Damage is wearing off\n");
 				stuffcmd (self, "bf\n");
 				sound (self, CHAN_AUTO, "items/damage2.wav", 1, ATTN_NORM);
 				self.super_time = time + 1;
@@ -1365,7 +1367,7 @@ void() CheckPowerups =
 		{
 			if (self.rad_time == 1)
 			{
-				sprint(self, "$qc_biosuit_fade");
+				sprint (self, "Air supply in Biosuit expiring\n");
 				stuffcmd (self, "bf\n");
 				sound (self, CHAN_AUTO, "items/suit2.wav", 1, ATTN_NORM);
 				self.rad_time = time + 1;
@@ -1495,7 +1497,8 @@ void() ClientConnect =
 		sprint (self, "QCAntilag in QE server mode\n");
 	}
 
-	bprint("$qc_entered", self.netname);
+	bprint (self.netname);
+	bprint (" entered the game\n");
 
 	// a client connecting during an intermission can cause problems
 	if (intermission_running)
@@ -1519,7 +1522,10 @@ void() ClientDisconnect =
 	// since they aren't *really* leaving
 
 	// let everyone else know
-	bprint("$qc_left_game", self.netname, ftos(self.frags));
+	bprint (self.netname);
+	bprint (" left the game with ");
+	bprint (ftos(self.frags));
+	bprint (" frags\n");
 
 	sound (self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE);
 
@@ -1537,7 +1543,8 @@ called when a player dies
 void(entity targ, entity attacker) ClientObituary =
 {
 	local	float rnum;
-	
+	local	string deathstring, deathstring2;
+
 	// from GPL QW source
 	local   float  attackerteam, targteam;
 	
@@ -1550,7 +1557,10 @@ void(entity targ, entity attacker) ClientObituary =
 	{
 		if (attacker.classname == "teledeath")
 		{
-			bprint("$qc_telefragged", targ.netname, attacker.owner.netname);
+			bprint (targ.netname);
+			bprint (" was telefragged by ");
+			bprint (attacker.owner.netname);
+			bprint ("\n");
 
 			attacker.owner.frags = attacker.owner.frags + 1;
 			return;
@@ -1558,7 +1568,9 @@ void(entity targ, entity attacker) ClientObituary =
 
 		if (attacker.classname == "teledeath2")
 		{
-			bprint("$qc_satans_power", targ.netname);
+			bprint ("Satan's power deflects ");
+			bprint (targ.netname);
+			bprint ("'s telefrag\n");
 
 			targ.frags = targ.frags - 1;
 			return;
@@ -1570,39 +1582,42 @@ void(entity targ, entity attacker) ClientObituary =
 			{
 				// killed self
 				attacker.frags = attacker.frags - 1;
+				bprint (targ.netname);
 				
 				if (targ.weapon == 64 && targ.waterlevel > 1)
 				{
 					if (targ.watertype == CONTENT_SLIME)
-						bprint("$qc_discharge_slime", targ.netname);
+						bprint (" discharges into the slime.\n");
 
 					else if (targ.watertype == CONTENT_LAVA)
-						bprint("$qc_discharge_lava", targ.netname);
+						bprint (" discharges into the lava.\n");
 
 					else
-						bprint("$qc_discharge_water", targ.netname);
+						bprint (" discharges into the water.\n");
 
 					return;
 				}
 				if (targ.weapon == 16)
-					bprint("$qc_suicide_pin", targ.netname);
+					bprint (" tries to put the pin back in\n");
 				else if (rnum)
-					bprint("$qc_suicide_bored", targ.netname);
+					bprint (" becomes bored with life\n");
 				else
-					bprint("$qc_suicide_loaded", targ.netname);
+					bprint (" tried to play soccer with a grenade\n");
 				return;
 			}
 			else if ( (teamplay == 2) && (targteam == attackerteam) &&
 				(attackerteam != 0) )
 			{
 				if (rnum < 0.25)
-					bprint("$qc_ff_teammate", attacker.netname);
+					deathstring = " mows down a teammate\n";
 				else if (rnum < 0.50)
-					bprint("$qc_ff_glasses", attacker.netname);
+					deathstring = " checks his glasses\n";
 				else if (rnum < 0.75)
-					bprint("$qc_ff_otherteam", attacker.netname);
+					deathstring = " gets a frag for the other team\n";
 				else
-					bprint("$qc_ff_friend", attacker.netname);
+					deathstring = " loses another friend\n";
+				bprint (attacker.netname);
+				bprint (deathstring);
 
 				attacker.frags = attacker.frags - 1;
 				return;
@@ -1615,45 +1630,45 @@ void(entity targ, entity attacker) ClientObituary =
 
 				if (rnum == IT_AXE)
 				{
-					bprint("$qc_death_ax", targ.netname, attacker.netname);
-					return;
+					deathstring = " was ax-murdered by ";
+					deathstring2 = "\n";
 				}
 
 				if (rnum == IT_SHOTGUN)
 				{
-					bprint("$qc_death_sg", targ.netname, attacker.netname);
-					return;
+					deathstring = " chewed on ";
+					deathstring2 = "'s boomstick\n";
 				}
 
 				if (rnum == IT_SUPER_SHOTGUN)
 				{
-					bprint("$qc_death_dbl", targ.netname, attacker.netname);
-					return;
+					deathstring = " ate 2 loads of ";
+					deathstring2 = "'s buckshot\n";
 				}
 
 				if (rnum == IT_NAILGUN)
 				{
-					bprint("$qc_death_nail", targ.netname, attacker.netname);
-					return;
+					deathstring = " was nailed by ";
+					deathstring2 = "\n";
 				}
 
 				if (rnum == IT_SUPER_NAILGUN)
 				{
-					bprint("$qc_death_sng", targ.netname, attacker.netname);
-					return;
+					deathstring = " was punctured by ";
+					deathstring2 = "\n";
 				}
 
 				if (rnum == IT_GRENADE_LAUNCHER)
 				{
 					if (targ.health < -40)
 					{
-						bprint("$qc_death_gl1", targ.netname, attacker.netname);
-						return;
+						deathstring = " eats ";
+						deathstring2 = "'s pineapple\n";
 					}
 					else
 					{
-						bprint("$qc_death_gl2", targ.netname, attacker.netname);
-						return;
+						deathstring = " was gibbed by ";
+						deathstring2 = "'s grenade\n";
 					}
 				}
 
@@ -1665,40 +1680,41 @@ void(entity targ, entity attacker) ClientObituary =
 
 						if (rnum < 0.3)
 						{
-							bprint("$qc_death_rl_quad1", targ.netname, attacker.netname);
-							return;
+							deathstring = " rides ";
+							deathstring2 = "'s quad rocket\n";
 						}
 						else if (rnum < 0.6)
 						{
-							bprint("$qc_death_rl_quad2", targ.netname, attacker.netname);
-							return;
+							deathstring = " rides ";
+							deathstring2 = "'s quad rocket\n";
 						}
 						else
 						{
-							bprint("$qc_death_rl1", targ.netname, attacker.netname);
-							return;
+							deathstring = " rides ";
+							deathstring2 = "'s quad rocket\n";
 						}
 					}
 					else
 					{
 						if (targ.health < -40)
 						{
-							bprint("$qc_death_rl2", targ.netname, attacker.netname);
-							return;
+							deathstring = " was gibbed by ";
+							deathstring2 = "'s rocket\n" ;
 						}
 						else
 						{
-							bprint("$qc_death_rl3", targ.netname, attacker.netname);
-							return;
+							deathstring = " rides ";
+							deathstring2 = "'s rocket\n";
 						}
 					}
 				}
 
 				if (rnum == IT_LIGHTNING)
 				{
+					deathstring = " accepts ";
 					if (attacker.waterlevel > 1)
 					{
-						bprint("$qc_death_lg1", targ.netname, attacker.netname);
+						deathstring2 = "'s discharge\n";
 						if (attacker.invincible_finished)
 						{
 							msg_entity = attacker;
@@ -1707,33 +1723,38 @@ void(entity targ, entity attacker) ClientObituary =
 						}
 					}
 					else
-						bprint("$qc_death_lg2", targ.netname, attacker.netname);
+						deathstring2 = "'s discharge\n";
 					
 					return;
 				}
+				bprint (targ.netname);
+				bprint (deathstring);
+				bprint (attacker.netname);
+				bprint (deathstring2);
 			}
 			return;
 		}
 		else
 		{
 			targ.frags = targ.frags - 1;		// killed self
+			bprint (targ.netname);
 			rnum = targ.watertype;
 
 			if (rnum == -3)
 			{
 				if (random() < 0.5)
-					bprint("$qc_death_drown1", targ.netname);
+					bprint (" sleeps with the fishes\n");
 				else
-					bprint("$qc_death_drown2", targ.netname);
+					bprint (" sucks it down\n");
 
 				return;
 			}
 			else if (rnum == -4)
 			{
 				if (random() < 0.5)
-					bprint("$qc_death_slime1", targ.netname);
+					bprint (" gulped a load of slime\n");
 				else
-					bprint("$qc_death_slime2", targ.netname);
+					bprint (" can't exist on slime alone\n");
 
 				return;
 			}
@@ -1741,38 +1762,38 @@ void(entity targ, entity attacker) ClientObituary =
 			{
 				if (targ.health < -15)
 				{
-					bprint("$qc_death_lava1", targ.netname);
+					bprint (" burst into flames\n");
 					return;
 				}
 
 				if (random() < 0.5)
-					bprint("$qc_death_lava2", targ.netname);
+					bprint (" turned into hot slag\n");
 				else
-					bprint("$qc_death_lava3", targ.netname);
+					bprint (" visits the Volcano God\n");
 
 				return;
 			}
 
 			if (attacker.solid == SOLID_BSP && attacker != world)
 			{	
-				bprint("$qc_death_squish", targ.netname);
+				bprint (" was squished\n");
 				return;
 			}
 
-			if(attacker.killstring)
+			if (attacker.killstring)
 			{
-				bprint(attacker.killstring, targ.netname);
+				bprint(attacker.killstring);
 				return;
 			}
 
 			if (targ.deathtype == "falling")
 			{
 				targ.deathtype = string_null;
-				bprint("$qc_death_fall", targ.netname);
+				bprint (" fell to his death\n");
 				return;
 			}
 
-			bprint("$qc_death_died", targ.netname);
+			bprint (" died\n");
 		}
 	}
 };

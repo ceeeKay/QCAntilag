@@ -719,8 +719,8 @@ string(string s) precache_sound		= #19;
 string(string s) precache_model		= #20;
 void(entity client, string s)stuffcmd = #21;
 entity(vector org, float rad) findradius = #22;
-void(string s, ...) bprint				= #0:ex_bprint;
-void(entity client, string s, ...) sprint = #0:ex_sprint;
+void(string s) bprint				= #23;
+void(entity client, string s) sprint = #24;
 void(string s, ...) dprint				= #25;
 string(float f) ftos				= #26;
 string(vector v) vtos				= #27;
@@ -785,7 +785,7 @@ void(string s) changelevel = #70;
 
 void(string var, string val) cvar_set = #72;	// sets cvar.value
 
-void(entity client, string s, ...) centerprint = #0:ex_centerprint;	// sprint, but in middle
+void(entity client, string s, optional string s1, optional string s2, optional string s3, optional string s4, optional string s5, optional string s6, optional string s7) centerprint = #73;	// sprint, but in middle
 
 void(vector pos, string samp, float vol, float atten) ambientsound = #74;
 

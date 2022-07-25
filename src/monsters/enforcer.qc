@@ -368,8 +368,8 @@ void() monster_enforcer =
 
 	setmodel (self, "progs/enforcer.mdl");
 
-	self.netname = "$qc_enforcer";
-	self.killstring = "$qc_ks_enforcer";
+	self.netname = "enforcer";
+	self.killstring = " was blasted by an Enforcer\n";
 	self.noise = "enforcer/sight1.wav";
 	self.noise1 = "enforcer/sight2.wav";
 	self.noise2 = "enforcer/sight3.wav";

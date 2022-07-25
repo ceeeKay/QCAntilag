@@ -521,8 +521,8 @@ void() monster_zombie =
 	setmodel (self, "progs/zombie.mdl");
 
 	self.noise = "zombie/z_idle.wav";
-	self.netname = "$qc_zombie";
-	self.killstring = "$qc_ks_zombie";
+	self.netname = "zombie";
+	self.killstring = " joins the Zombies\n";
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 60;

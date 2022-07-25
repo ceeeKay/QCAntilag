@@ -437,8 +437,8 @@ void() monster_wizard =
 	setmodel (self, "progs/wizard.mdl");
 
 	self.noise = "wizard/wsight.wav";
-	self.netname = "$qc_scrag";
-	self.killstring = "$qc_ks_scrag";
+	self.netname = "scrag";
+	self.killstring = " was scragged by a Scrag\n";
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 80;

@@ -512,8 +512,8 @@ void() monster_ogre =
 	setmodel (self, "progs/ogre.mdl");
 
 	self.noise = "ogre/ogwake.wav";
-	self.netname = "$qc_ogre";
-	self.killstring = "$qc_ks_ogre";
+	self.netname = "ogre";
+	self.killstring = " was destroyed by an Ogre\n";
 
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
 	self.health = 200;
