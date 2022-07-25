@@ -16,7 +16,21 @@
 
 // QCAntilag: this stuff is only valid in FTE or another QW compatible engine
 .void() customphysics;
+string(entity e, string key) infokey = #0:infokey;
 float(entity e, string key) infokeyf = #0:infokeyf;
+
+const float MSG_MULTICAST = 4;	/* The byte(s) will be written into the multicast buffer for more selective sending. Messages sent this way will never be split across packets, and using this for csqc-only messages will not break protocol translation. */
+const float MULTICAST_ALL = 0;	/* The multicast message is unreliably sent to all players. MULTICAST_ constants are valid arguments for the multicast builtin, which ignores the specified origin when given this constant. */
+const float MULTICAST_PHS = 1;	/* The multicast message is unreliably sent to only players that can potentially hear the specified origin. Its quite loose. */
+const float MULTICAST_PVS = 2;	/* The multicast message is unreliably sent to only players that can potentially see the specified origin. */
+const float MULTICAST_ONE = 6;	/* The multicast message is unreliably sent to the player (AND ALL TRACKING SPECTATORS) specified in the msg_entity global. The specified origin is ignored. */
+const float MULTICAST_ONE_NOSPECS = 9;	/* The multicast message is unreliably sent to the player specified in the msg_entity global. The specified origin is ignored. */
+const float MULTICAST_ALL_R = 3;	/* The multicast message is reliably sent to all players. The specified origin is ignored. */
+const float MULTICAST_PHS_R = 4;	/* The multicast message is reliably sent to only players that can potentially hear the specified origin. Players might still not receive it if they are out of range. */
+const float MULTICAST_PVS_R = 5;	/* The multicast message is reliably sent to only players that can potentially see the specified origin. Players might still not receive it if they cannot see the event. */
+const float MULTICAST_ONE_R = 7;	/* The multicast message is reliably sent to the player (AND ALL TRACKING SPECTATORS) specified in the msg_entity global. The specified origin is ignored */
+const float MULTICAST_ONE_R_NOSPECS = 10;	/* The multicast message is reliably sent to the player specified in the msg_entity global. The specified origin is ignored */
+float(vector where, float set) multicast = #0:multicast;
 //
 
 // QCAntilag: globals
