@@ -1762,8 +1762,6 @@ void(entity targ, entity attacker) ClientObituary =
 					}
 					else
 						deathstring2 = "'s discharge\n";
-					
-					return;
 				}
 				bprint (targ.netname);
 				bprint (deathstring);
