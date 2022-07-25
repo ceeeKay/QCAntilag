@@ -763,16 +763,21 @@ float(entity targ, entity inflictor) CanDamage;
 #define ANTILAG_STATES				0x10
 #define ANTILAG_MASK				0x0F
 #define	ANTILAG_MAX_RESPONSETIME	150
+#define ANTILAG_FL_SPAWNTEST		0x01
 
-.vector lastorigin[ANTILAG_STATES];
-.float	lastorigintime[ANTILAG_STATES];
-.float	antilag_updatetime;
+// QCAntilag: entity properties
+.float 	antilag_flags;
+.vector	lastorigin[ANTILAG_STATES];
+.float 	lastorigintime[ANTILAG_STATES];
+.float 	antilag_updatetime;
 .vector hold_origin;
-.float responsetime;
-.float responsetime1;
-.float responsetime2;
-.float responsetime3;
-.float spamtime;
+.vector	spawn_angles;
+.float 	spawn_time;
+.float 	responsetime;
+.float 	responsetime1;
+.float 	responsetime2;
+.float 	responsetime3;
+.float 	spamtime;
 
 // QCAntilag: this stuff is only valid in FTE or another QW compatible engine
 .void() customphysics;
