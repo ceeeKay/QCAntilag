@@ -699,6 +699,39 @@ void() DecodeLevelParms;
 void() PlayerDie;
 
 
+// QCAntilag: compare angles to see if they're within margin of error
+float(vector ang1, vector ang2) CompareNetAngles =
+{
+	// putting this in a loop inexplicably causes a crash... no idea
+	// the math here is just replicating WriteAngle behavior
+	ang1[0] = floor(ang1[0]*(256/360) - 0.5) & 255;
+	ang2[0] = floor(ang2[0]*(256/360) - 0.5) & 255;
+	ang1[1] = floor(ang1[1]*(256/360) - 0.5) & 255;
+	ang2[1] = floor(ang2[1]*(256/360) - 0.5) & 255;
+	ang1[2] = floor(ang1[2]*(256/360) - 0.5) & 255;
+	ang2[2] = floor(ang2[2]*(256/360) - 0.5) & 255;
+	
+	return (ang1 == ang2);
+};
+
+// QCAntilag: check angles for spawn
+void() CheckSpawnTest =
+{
+	if (self.antilag_flags & ANTILAG_FL_SPAWNTEST && self.spawn_time)
+	{
+		if (CompareNetAngles(self.v_angle, self.spawn_angles))
+		{
+			self.responsetime1 = (time - self.spawn_time) * 1000;
+			self.spawn_time = 0;
+		}
+		else if (time - self.spawn_time > 0.5) // timeout, something went wrong. not exactly unexpected with this hack
+		{
+			self.spawn_time = 0;
+		}
+	}
+}
+
+
 void() PutClientInServer =
 {
 	local	entity spot;
@@ -784,8 +817,25 @@ void() PutClientInServer =
 	self.origin = spot.origin + '0 0 1';
 	self.angles = spot.angles;
 	self.fixangle = TRUE;		// turn this way immediately
+	
+// QCAntilag: Track spawn angles and time so we can determine ping time from fixangle if needed
+	self.spawn_angles = self.angles;
+	self.spawn_time = time;
+	if (self.antilag_flags & ANTILAG_FL_SPAWNTEST) // send the angles manually if we're using spawntest ping check
+	{
+		self.fixangle = FALSE;
+		msg_entity = self;
+		
+		WriteByte(MSG_ONE, SVC_SETANGLE);
+		WriteAngle(MSG_ONE, self.angles[0]);
+		WriteAngle(MSG_ONE, self.angles[1]);
+		WriteAngle(MSG_ONE, self.angles[2]);
+	}
 
-	// oh, this is a hack!
+// QCAntilag: clear antilag rewind positions so we don't rewind players back to their dead positions after respawn
+	ClearLastOrigin();
+
+// oh, this is a hack!
 	setmodel (self, "progs/eyes.mdl");
 	modelindex_eyes = self.modelindex;
 
@@ -1198,6 +1248,10 @@ void() PlayerPreThink =
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
+	
+	// QCAntilag: spawntest for cl_filterstuffcmd clients
+	CheckSpawnTest();
+	
 
 	makevectors (self.v_angle);		// is this still used
 

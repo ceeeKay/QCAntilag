@@ -2,17 +2,21 @@
 #define ANTILAG_STATES				0x10
 #define ANTILAG_MASK				0x0F
 #define	ANTILAG_MAX_RESPONSETIME	150
+#define ANTILAG_FL_SPAWNTEST		0x01
 
 // QCAntilag: entity properties
-.vector lastorigin[ANTILAG_STATES];
-.float	lastorigintime[ANTILAG_STATES];
-.float	antilag_updatetime;
+.float 	antilag_flags;
+.vector	lastorigin[ANTILAG_STATES];
+.float 	lastorigintime[ANTILAG_STATES];
+.float 	antilag_updatetime;
 .vector hold_origin;
-.float responsetime;
-.float responsetime1;
-.float responsetime2;
-.float responsetime3;
-.float spamtime;
+.vector	spawn_angles;
+.float 	spawn_time;
+.float 	responsetime;
+.float 	responsetime1;
+.float 	responsetime2;
+.float 	responsetime3;
+.float 	spamtime;
 
 // QCAntilag: this stuff is only valid in FTE or another QW compatible engine
 .void() customphysics;
@@ -61,8 +65,9 @@ void () client_ping_think =
 
 		if (client.finaldest_y > self.finaldest_x) // if we got a packet back
 		{
+			self.antilag_flags &= ~ANTILAG_FL_SPAWNTEST;
 			client.responsetime1 = (floor(client.finaldest_y - self.finaldest_x) - 16);
-
+			
 			// cap to acceptable values
 			client.responsetime1 = client.responsetime1 < 0 ? 0 : client.responsetime1;
 			client.responsetime1 = client.responsetime1 > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : client.responsetime1;
@@ -70,7 +75,10 @@ void () client_ping_think =
 		else // packet dropped, lets make something up
 		{
 			if (self.finaldest_z > client.finaldest_y) // client hasn't responded in a long time, probably cl_filterstuffcmd 1
-				client.responsetime1 = 55;
+			{
+				client.antilag_flags |= ANTILAG_FL_SPAWNTEST;
+				client.responsetime1 = client.responsetime;
+			}
 			else
 				client.responsetime1 = client.responsetime;
 		}
@@ -90,10 +98,10 @@ void () client_ping_think =
 		{
 			client.responsetime = client.responsetime1;
 		}
-		client = find(client, classname, "player");
-	}
+        client = find(client, classname, "player");
+    }
 
-	remove(self);
+    remove(self);
 };
 
 // QCAntilag: Request ping (response) time for all clients
@@ -104,12 +112,12 @@ void () client_responsetime_get_all =
 		for(entity pl = find(world, classname, "player"); pl; pl = find(pl, classname, "player"))
 		{
 			pl.responsetime = infokeyf(pl, "ping") - 8; // account for QW input frame timey-ness
-
+			
 			// cap to acceptable values
 			pl.responsetime = pl.responsetime < 0 ? 0 : pl.responsetime;
 			pl.responsetime = pl.responsetime > ANTILAG_MAX_RESPONSETIME ? ANTILAG_MAX_RESPONSETIME : pl.responsetime;
 		}
-
+		
 		responsetimecheck = (time + 3); // we're using engine stuff, so we can speed this polling up a bit
 		return;
 	}
