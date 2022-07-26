@@ -12,7 +12,7 @@ Known to work/tested with:
 
 Contributors/Thanks:
 
-Based upon 1.06 version of 2021 Quake rerelease/remaster sources at
+Based upon 2021 Quake rerelease/remaster sources at
 https://github.com/id-Software/quake-rerelease-qc
 
 This code is released under the GPLv2 license.
