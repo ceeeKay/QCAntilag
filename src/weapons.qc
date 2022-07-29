@@ -64,7 +64,11 @@ void() W_FireAxe =
 
 	traceline (source, source + v_forward*64, FALSE, self);
 	if (trace_fraction == 1.0)
+	{
+		// QCAntilag: Put all the player entities back to their actual (server) positions
+		antilag_restore_players();
 		return;
+	}
 	
 	org = trace_endpos - v_forward*4;
 
