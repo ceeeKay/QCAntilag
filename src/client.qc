@@ -800,8 +800,9 @@ void() PutClientInServer =
 		WriteAngle(MSG_ONE, self.angles[2]);
 	}
 
-// QCAntilag: clear antilag rewind positions so we don't rewind players back to their dead positions after respawn
+// QCAntilag: clear antilag rewind, restore positions so we don't move players back to their dead positions after respawn
 	ClearLastOrigin();
+	self.hold_origin = self.origin;
 
 // oh, this is a hack!
 	setmodel (self, "progs/eyes.mdl");
