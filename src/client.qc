@@ -745,6 +745,8 @@ void() PlayerDeathThink =
 };
 
 
+// CSQCPrediction: This is moved into pl_phys.qc PL_Jump(), to be accessed by both CSQC and SSQC
+/*
 void() PlayerJump =
 {
 
@@ -788,6 +790,7 @@ void() PlayerJump =
 	sound (self, CHAN_BODY, "player/plyrjmp8.wav", 1, ATTN_NORM);
 	self.velocity_z = self.velocity_z + 270;
 };
+*/
 
 
 /*
@@ -900,6 +903,7 @@ void() CheckWaterJump =
 		if (trace_fraction == 1)
 		{	// open at eye level
 			self.flags = self.flags | FL_WATERJUMP;
+			// CSQCPrediction: To prevent framerate dependent yucky jumps, we have to raise this velocity_z to 260 or so. There is probably a better solution but NQ waterjump sucks.
 			self.velocity_z = 260;
 			self.flags = self.flags - (self.flags & FL_JUMPRELEASED);
 			self.teleport_time = time + 2;	// safety net
@@ -916,6 +920,9 @@ PlayerPreThink
 Called every frame before physics are run
 ================
 */
+
+// CSQCPrediction: We need to stub PlayerPreThink so the engine doesn't do anything silly, this is a simple copy-paste.
+// CSQCPrediction: Also remove if (self.button2) PlayerJump(); code from prethink, this is handled more predictably now in the pl_phys code
 void() PlayerPreThink =
 {
 	// Moved to PM_PlayerPreThink
@@ -1255,6 +1262,8 @@ PlayerPostThink
 Called every frame after physics are run
 ================
 */
+
+// CSQCPrediction: We need to stub PlayerPostThink so the engine doesn't do anything silly, this is a simple copy-paste.
 void() PlayerPostThink =
 {
 	// Moved to PM_PlayerPostThink
@@ -1316,6 +1325,7 @@ called when a player connects to a server
 */
 void() ClientConnect =
 {
+	// CSQCPrediction: Entrypoint for client connecting, this decides if they're a QW or NQ client and how to handle their inputs.
 	PM_ClientConnect();
 	
 	bprint (self.netname);
@@ -1341,6 +1351,7 @@ void() ClientDisconnect =
 	// if the level end trigger has been activated, just return
 	// since they aren't *really* leaving
 	
+	// CSQCPrediction: Cleanup any stuff we have to cleanup related to our prediction code.
 	PM_ClientDisconnect();
 	
 	// let everyone else know
