@@ -23,6 +23,8 @@ void V_CalcBob()
 	
 	v_bobtime += frametime;
 	
+	if (autocvar_cl_bobcycle == 0)
+		return;
 	
 	float	cycle;
 	cycle = cltime - (int)(v_bobtime / autocvar_cl_bobcycle) * autocvar_cl_bobcycle;
