@@ -13,7 +13,12 @@ float(string cmdstr) CSQC_ConsoleCommand
 	
 }
 
-void(float apilevel, string enginename, float engineversion) CSQC_Init =
+void() CSQC_Ent_Remove
+{
+	remove(self);
+}
+
+void(float apilevel, string enginename, float engineversion) CSQC_Init
 {
 	V_ViewmodelCreate();
 }
@@ -44,7 +49,6 @@ void(float vwidth, float vheight, float notmenu) CSQC_UpdateView
 	setviewprop(VF_DRAWENGINESBAR, 1);
 	renderscene();
 }
-
 
 
 

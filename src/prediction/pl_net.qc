@@ -568,7 +568,10 @@ float PL_Predraw()
 			PL_BasicXerp(xerp_time);
 			self.origin += self.velocity * self.xerp_lazy_lastused;
 			
-			self.origin_errorcorrect = temp_org - (self.origin - self.origin_errorcorrect);
+			if (temp_org == '0 0 0') // if this was a fresh entity just added from PVS
+				self.origin_errorcorrect = 0;
+			else
+				self.origin_errorcorrect = temp_org - (self.origin - self.origin_errorcorrect);
 		}
 		
 		
@@ -638,6 +641,9 @@ void NetEntity_Player(float isnew)
 	//self.net_old.groundentity = 0;
 	self.net_lastsent.update_time = time;
 	self.net_lastsent.update_state = NET_STATE_FRESH;
+	
+	if (self.classname != "player") // a fix for some weird CSQC quirks with reusing entities
+		isnew = TRUE;
 	
 	float netflags = readbyte();
 	float sendflags;
@@ -808,6 +814,8 @@ void NetEntity_Player(float isnew)
 	
 	if (isnew)
 	{
+		self.net_old.update_time = time;
+		
 		self.classname = "player";
 		self.drawmask = MASK_ENGINE;
 		self.predraw = PL_Predraw;
