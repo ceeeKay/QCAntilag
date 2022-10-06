@@ -1162,6 +1162,21 @@ void PM_ClientDisconnect()
 }
 
 
+void PL_DoThink()
+{
+	if (self.nextthink && time > self.nextthink)
+	{
+		float nthink = self.nextthink;
+		self.think();
+		
+		if (nthink == self.nextthink)
+		{
+			self.think = __NULL__;
+			self.nextthink = 0;
+		}
+	}
+}
+
 
 void() PM_PlayerPreThink;
 void() PM_PlayerPostThink;
@@ -1176,6 +1191,8 @@ void PM_RunClient()
 	
 	PL_SimulateClientCommands();
 	PL_PrepareSendFlags();
+	
+	PL_DoThink();
 	
 	self.v_angle = input_angles;
 	makevectors(input_angles);
